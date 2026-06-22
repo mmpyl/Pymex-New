@@ -1,0 +1,175 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: pymex-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-pymex}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-pymex123}
+      POSTGRES_DB: ${DB_NAME:-pymex_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d
+    networks:
+      - pymex-network
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-pymex}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: pymex-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - pymex-network
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend (Node.js)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: docker/Dockerfile
+    container_name: pymex-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-pymex}
+      DB_PASSWORD: ${DB_PASSWORD:-pymex123}
+      DB_NAME: ${DB_NAME:-pymex_db}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET:-your-secret-key}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      MAIL_HOST: ${MAIL_HOST:-smtp.mailtrap.io}
+      MAIL_PORT: ${MAIL_PORT:-2525}
+      MAIL_USER: ${MAIL_USER:-}
+      MAIL_PASS: ${MAIL_PASS:-}
+    volumes:
+      - ./backend:/app
+      - backend_node_modules:/app/node_modules
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - pymex-network
+
+  # Frontend (React)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: docker/Dockerfile
+      target: development
+    container_name: pymex-frontend
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: http://localhost:3000/api
+      VITE_ML_SERVICE_URL: http://localhost:8000
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - pymex-network
+
+  # ML Service (Python/FastAPI)
+  ml-service:
+    build:
+      context: ./ml-service
+      dockerfile: docker/Dockerfile
+    container_name: pymex-ml-service
+    restart: unless-stopped
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      DATABASE_URL: postgresql://${DB_USER:-pymex}:${DB_PASSWORD:-pymex123}@postgres:5432/ml_db
+    volumes:
+      - ./ml-service:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - pymex-network
+
+  # Facturación Service (PHP)
+  facturacion-service:
+    build:
+      context: ./facturacion-service
+      dockerfile: docker/Dockerfile
+    container_name: pymex-facturacion
+    restart: unless-stopped
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-pymex}
+      DB_PASSWORD: ${DB_PASSWORD:-pymex123}
+      DB_NAME: ${DB_NAME:-pymex_facturacion}
+    volumes:
+      - ./facturacion-service:/var/www/html
+    ports:
+      - "8001:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - pymex-network
+
+  # Nginx (Production only)
+  nginx:
+    image: nginx:alpine
+    container_name: pymex-nginx
+    restart: unless-stopped
+    profiles:
+      - production
+    volumes:
+      - ./infraestructura/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./infraestructura/nginx/conf.d:/etc/nginx/conf.d
+      - ./frontend/dist:/usr/share/nginx/html
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - pymex-network
+
+networks:
+  pymex-network:
+    driver: bridge
+    name: pymex-network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  backend_node_modules:
+  frontend_node_modules:
