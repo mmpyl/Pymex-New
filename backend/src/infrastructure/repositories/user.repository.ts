@@ -1,173 +1,139 @@
-import { Op } from 'sequelize';
+import { UserModel } from '../database/models/user.model';
+import { IUserRepository } from '../../domain/user/repositories/IUserRepository';
 import { User } from '../../domain/user/entities/User';
 import { UserId } from '../../domain/user/value-objects/UserId';
 import { Email } from '../../domain/user/value-objects/Email';
 import { Password } from '../../domain/user/value-objects/Password';
 import { UserRole } from '../../domain/user/value-objects/UserRole';
-import { IUserRepository } from '../../domain/user/repositories/IUserRepository';
-import { sequelize } from '../database/config/sequelize-instance';
-import { Model, DataTypes, Optional } from 'sequelize';
+import { UserNotFoundError } from '../../domain/user/errors/UserNotFoundError';
+import { Op } from 'sequelize';
 
-interface UserModel extends Model {
-  id: string;
-  nombre: string;
-  email: string;
-  password: string;
-  rol: string;
-  empresa_id?: number;
-  estado: string;
-  fecha_registro: Date;
-}
-
-type UserCreationAttributes = Optional<UserModel, 'id' | 'fecha_registro'>;
-
-export class SequelizeUserRepository implements IUserRepository {
-  private userModel: any;
-
-  constructor() {
-    this.userModel = sequelize.define<UserModel, UserCreationAttributes>(
-      'usuarios_business',
-      {
-        id: {
-          type: DataTypes.UUID,
-          defaultValue: DataTypes.UUIDV4,
-          primaryKey: true,
-        },
-        nombre: {
-          type: DataTypes.STRING(100),
-          allowNull: false,
-        },
-        email: {
-          type: DataTypes.STRING(100),
-          allowNull: false,
-        },
-        password: {
-          type: DataTypes.STRING(255),
-          allowNull: false,
-        },
-        rol: {
-          type: DataTypes.STRING(50),
-          allowNull: false,
-        },
-        empresa_id: {
-          type: DataTypes.INTEGER,
-          allowNull: true,
-          references: {
-            model: 'empresas',
-            key: 'id',
-          },
-        },
-        estado: {
-          type: DataTypes.STRING(10),
-          defaultValue: 'activo',
-        },
-        fecha_registro: {
-          type: DataTypes.DATE,
-          defaultValue: DataTypes.NOW,
-        },
-      },
-      {
-        tableName: 'usuarios_business',
-        timestamps: false,
-        indexes: [
-          { fields: ['empresa_id'] },
-          { fields: ['email'] },
-        ],
-      }
-    );
-  }
-
+export class UserRepository implements IUserRepository {
   async findById(id: string): Promise<User | null> {
-    const userRecord = await this.userModel.findByPk(id);
-    if (!userRecord) return null;
-
-    return this.mapToDomain(userRecord);
+    const model = await UserModel.findByPk(id);
+    if (!model) return null;
+    
+    return User.restore({
+      id: model.id,
+      nombre: model.nombre,
+      email: model.email,
+      password: model.password,
+      rol: model.rol,
+      empresaId: model.empresaId,
+      estado: model.estado,
+      fechaRegistro: model.fechaRegistro,
+    });
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    const userRecord = await this.userModel.findOne({ where: { email } });
-    if (!userRecord) return null;
-
-    return this.mapToDomain(userRecord);
-  }
-
-  async findByEmpresaId(
-    empresaId: number,
-    page: number = 1,
-    limit: number = 10
-  ): Promise<{ users: User[]; total: number }> {
-    const offset = (page - 1) * limit;
-    const { rows, count } = await this.userModel.findAndCountAll({
-      where: { empresa_id: empresaId },
-      limit,
-      offset,
-      order: [['fecha_registro', 'DESC']],
-    });
-
-    return {
-      users: rows.map((record: any) => this.mapToDomain(record)),
-      total: count,
-    };
-  }
-
-  async save(user: User): Promise<void> {
-    const props = user.toObject();
-    await this.userModel.create({
-      id: props.id.getValue(),
-      nombre: props.nombre,
-      email: props.email.getValue(),
-      password: props.password.getValue(),
-      rol: props.rol.getValue(),
-      empresa_id: props.empresaId,
-      estado: props.estado,
-      fecha_registro: props.fechaRegistro,
+    const model = await UserModel.findOne({ where: { email } });
+    if (!model) return null;
+    
+    return User.restore({
+      id: model.id,
+      nombre: model.nombre,
+      email: model.email,
+      password: model.password,
+      rol: model.rol,
+      empresaId: model.empresaId,
+      estado: model.estado,
+      fechaRegistro: model.fechaRegistro,
     });
   }
 
-  async update(user: User): Promise<void> {
-    const props = user.toObject();
-    const record = await this.userModel.findByPk(props.id.getValue());
-    if (!record) {
-      throw new Error(`User with ID ${props.id.getValue()} not found`);
+  async save(user: User): Promise<User> {
+    const [model] = await UserModel.findOrCreate({
+      where: { email: user.getEmail().getValue() },
+      defaults: {
+        id: user.getId().getValue(),
+        nombre: user.getNombre(),
+        email: user.getEmail().getValue(),
+        password: user.getPassword().getHash(),
+        rol: user.getRol().getValue(),
+        empresaId: user.getEmpresaId(),
+        estado: user.getEstado(),
+        fechaRegistro: user.getFechaRegistro(),
+      },
+    });
+
+    if (!model) {
+      throw new Error('Failed to create user');
     }
 
-    await record.update({
-      nombre: props.nombre,
-      email: props.email.getValue(),
-      password: props.password.getValue(),
-      rol: props.rol.getValue(),
-      empresa_id: props.empresaId,
-      estado: props.estado,
+    await model.update({
+      nombre: user.getNombre(),
+      email: user.getEmail().getValue(),
+      password: user.getPassword().getHash(),
+      rol: user.getRol().getValue(),
+      empresaId: user.getEmpresaId(),
+      estado: user.getEstado(),
+    });
+
+    return User.restore({
+      id: model.id,
+      nombre: model.nombre,
+      email: model.email,
+      password: model.password,
+      rol: model.rol,
+      empresaId: model.empresaId,
+      estado: model.estado,
+      fechaRegistro: model.fechaRegistro,
+    });
+  }
+
+  async update(user: User): Promise<User> {
+    const model = await UserModel.findByPk(user.getId().getValue());
+    if (!model) {
+      throw new UserNotFoundError();
+    }
+
+    await model.update({
+      nombre: user.getNombre(),
+      email: user.getEmail().getValue(),
+      password: user.getPassword().getHash(),
+      rol: user.getRol().getValue(),
+      empresaId: user.getEmpresaId(),
+      estado: user.getEstado(),
+    });
+
+    return User.restore({
+      id: model.id,
+      nombre: model.nombre,
+      email: model.email,
+      password: model.password,
+      rol: model.rol,
+      empresaId: model.empresaId,
+      estado: model.estado,
+      fechaRegistro: model.fechaRegistro,
     });
   }
 
   async delete(id: string): Promise<void> {
-    const record = await this.userModel.findByPk(id);
-    if (!record) {
-      throw new Error(`User with ID ${id} not found`);
+    const model = await UserModel.findByPk(id);
+    if (!model) {
+      throw new UserNotFoundError();
     }
-    await record.destroy();
+    await model.destroy();
   }
 
-  async existsByEmail(email: string, excludeId?: string): Promise<boolean> {
-    const where: any = { email };
-    if (excludeId) {
-      where.id = { [Op.ne]: excludeId };
-    }
-    const record = await this.userModel.findOne({ where });
-    return !!record;
+  async existsByEmail(email: string): Promise<boolean> {
+    const model = await UserModel.findOne({ where: { email } });
+    return !!model;
   }
 
-  private mapToDomain(record: any): User {
-    return User.restore({
-      id: UserId.create(record.id),
-      nombre: record.nombre,
-      email: Email.create(record.email),
-      password: Password.create(record.password),
-      rol: UserRole.create(record.rol as any),
-      empresaId: record.empresa_id,
-      estado: record.estado as any,
-      fechaRegistro: record.fecha_registro,
-    });
+  async findAll(empresaId?: number): Promise<User[]> {
+    const where = empresaId ? { empresaId } : {};
+    const models = await UserModel.findAll({ where });
+    
+    return models.map(model => User.restore({
+      id: model.id,
+      nombre: model.nombre,
+      email: model.email,
+      password: model.password,
+      rol: model.rol,
+      empresaId: model.empresaId,
+      estado: model.estado,
+      fechaRegistro: model.fechaRegistro,
+    }));
   }
 }

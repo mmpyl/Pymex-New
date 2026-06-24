@@ -7,9 +7,10 @@ dist/
 build/
 target/
 
-# TypeScript/JavaScript specific
+# TypeScript/JavaScript
 *.tsbuildinfo
 *.js.map
+*.jsx.map
 *.ts.map
 
 # Environment variables
@@ -24,17 +25,17 @@ target/
 coverage/
 .nyc_output/
 
-# IDE specific
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# OS generated
+# OS
 .DS_Store
 Thumbs.db
 
-# Python (if mixed project)
+# Python (if present)
 __pycache__/
 *.pyc
 *.pyo
@@ -43,8 +44,66 @@ __pycache__/
 venv/
 .venv/
 .env
+.mypy_cache/
+.pytest_cache/
+.coverage
+
+# Java (if present)
+*.class
+*.jar
+*.war
+*.ear
+.gradle/
+build/
+target/
+
+# Go (if present)
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.prof
+vendor/
+
+# C/C++ (if present)
+*.o
+*.a
+*.so
+*.dll
+*.dylib
+*.exe
+*.out
+*.obj
 
 # Temporary files
 *.tmp
 *.temp
+*.bak
+*.backup
+
+# Archives
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
 ```
