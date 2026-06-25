@@ -7,6 +7,7 @@ import { RegisterUserUseCase } from '../../../application/auth/use-cases/Registe
 import { RefreshTokenUseCase } from '../../../application/auth/use-cases/RefreshTokenUseCase';
 import { LogoutUseCase } from '../../../application/auth/use-cases/LogoutUseCase';
 import { authMiddleware } from '../middleware/auth.middleware';
+import { env } from '../../config/env';
 
 const router = Router();
 
@@ -14,8 +15,14 @@ const router = Router();
 const userRepository = new UserRepository();
 const passwordService = new BcryptPasswordService();
 
-// Initialize use cases
-const loginUseCase = new LoginUseCase(userRepository, passwordService);
+// Initialize use cases with JWT configuration from environment
+const loginUseCase = new LoginUseCase(
+  userRepository, 
+  passwordService,
+  env.JWT_SECRET,
+  env.JWT_EXPIRES_IN || '15m',
+  env.JWT_REFRESH_EXPIRES_IN || '7d'
+);
 const registerUseCase = new RegisterUserUseCase(userRepository, passwordService);
 const refreshTokenUseCase = new RefreshTokenUseCase();
 const logoutUseCase = new LogoutUseCase();
