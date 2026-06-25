@@ -18,7 +18,15 @@ export class Password {
     return new Password(password);
   }
 
+  static fromHash(hash: string): Password {
+    return new Password(hash);
+  }
+
   getValue(): string {
+    return this.value;
+  }
+
+  getHash(): string {
     return this.value;
   }
 

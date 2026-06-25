@@ -41,8 +41,30 @@ export class UserRepository implements IUserRepository {
     });
   }
 
-  async save(user: User): Promise<User> {
-    const [model] = await UserModel.findOrCreate({
+  async findByEmpresaId(empresaId: number, page: number = 1, limit: number = 10): Promise<{ users: User[]; total: number }> {
+    const offset = (page - 1) * limit;
+    const { count, rows } = await UserModel.findAndCountAll({
+      where: { empresaId },
+      offset,
+      limit,
+    });
+    
+    const users = rows.map(model => User.restore({
+      id: model.id,
+      nombre: model.nombre,
+      email: model.email,
+      password: model.password,
+      rol: model.rol,
+      empresaId: model.empresaId,
+      estado: model.estado,
+      fechaRegistro: model.fechaRegistro,
+    }));
+    
+    return { users, total: count };
+  }
+
+  async save(user: User): Promise<void> {
+    const [model, created] = await UserModel.findOrCreate({
       where: { email: user.getEmail().getValue() },
       defaults: {
         id: user.getId().getValue(),
@@ -56,32 +78,14 @@ export class UserRepository implements IUserRepository {
       },
     });
 
-    if (!model) {
-      throw new Error('Failed to create user');
+    if (!created) {
+      throw new Error('User already exists');
     }
 
-    await model.update({
-      nombre: user.getNombre(),
-      email: user.getEmail().getValue(),
-      password: user.getPassword().getHash(),
-      rol: user.getRol().getValue(),
-      empresaId: user.getEmpresaId(),
-      estado: user.getEstado(),
-    });
-
-    return User.restore({
-      id: model.id,
-      nombre: model.nombre,
-      email: model.email,
-      password: model.password,
-      rol: model.rol,
-      empresaId: model.empresaId,
-      estado: model.estado,
-      fechaRegistro: model.fechaRegistro,
-    });
+    return;
   }
 
-  async update(user: User): Promise<User> {
+  async update(user: User): Promise<void> {
     const model = await UserModel.findByPk(user.getId().getValue());
     if (!model) {
       throw new UserNotFoundError();
@@ -95,17 +99,6 @@ export class UserRepository implements IUserRepository {
       empresaId: user.getEmpresaId(),
       estado: user.getEstado(),
     });
-
-    return User.restore({
-      id: model.id,
-      nombre: model.nombre,
-      email: model.email,
-      password: model.password,
-      rol: model.rol,
-      empresaId: model.empresaId,
-      estado: model.estado,
-      fechaRegistro: model.fechaRegistro,
-    });
   }
 
   async delete(id: string): Promise<void> {
@@ -116,24 +109,12 @@ export class UserRepository implements IUserRepository {
     await model.destroy();
   }
 
-  async existsByEmail(email: string): Promise<boolean> {
-    const model = await UserModel.findOne({ where: { email } });
+  async existsByEmail(email: string, excludeId?: string): Promise<boolean> {
+    const where: any = { email };
+    if (excludeId) {
+      where.id = { [Op.ne]: excludeId };
+    }
+    const model = await UserModel.findOne({ where });
     return !!model;
-  }
-
-  async findAll(empresaId?: number): Promise<User[]> {
-    const where = empresaId ? { empresaId } : {};
-    const models = await UserModel.findAll({ where });
-    
-    return models.map(model => User.restore({
-      id: model.id,
-      nombre: model.nombre,
-      email: model.email,
-      password: model.password,
-      rol: model.rol,
-      empresaId: model.empresaId,
-      estado: model.estado,
-      fechaRegistro: model.fechaRegistro,
-    }));
   }
 }
