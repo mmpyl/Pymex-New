@@ -7,8 +7,8 @@ import { UserNotFoundError } from '../../../domain/user/errors/UserNotFoundError
 export class UpdateUserProfileUseCase {
   constructor(private userRepository: IUserRepository) {}
 
-  async execute(dto: UpdateUserDto): Promise<UserResponseDto> {
-    const user = await this.userRepository.findById(dto.id);
+  async execute(userId: number, dto: Partial<UpdateUserDto>): Promise<UserResponseDto> {
+    const user = await this.userRepository.findById(userId);
     
     if (!user) {
       throw new UserNotFoundError();
@@ -19,7 +19,7 @@ export class UpdateUserProfileUseCase {
     }
 
     if (dto.email !== undefined) {
-      const exists = await this.userRepository.existsByEmail(dto.email, dto.id);
+      const exists = await this.userRepository.existsByEmail(dto.email, userId);
       if (exists) {
         throw new Error('Email already in use');
       }

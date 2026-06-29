@@ -1,29 +1,34 @@
 import { Request, Response } from 'express';
-import { UserRepository } from '../../repositories/user.repository';
-import { GetAllUsersUseCase } from '../../../application/users/use-cases/GetAllUsersUseCase';
-import { GetUserByIdUseCase } from '../../../application/users/use-cases/GetUserByIdUseCase';
-import { DeleteUserUseCase } from '../../../application/users/use-cases/DeleteUserUseCase';
-import { ChangeUserRoleUseCase } from '../../../application/users/use-cases/ChangeUserRoleUseCase';
-import { SuspendUserUseCase } from '../../../application/users/use-cases/SuspendUserUseCase';
+import { UserRepository } from '../../../repositories/user.repository';
+import { BcryptPasswordService } from '../../../services/BcryptPasswordService';
+import { GetAllUsersUseCase } from '../../../../application/users/use-cases/GetAllUsersUseCase';
+import { GetUserByIdUseCase } from '../../../../application/users/use-cases/GetUserByIdUseCase';
+import { DeleteUserUseCase } from '../../../../application/users/use-cases/DeleteUserUseCase';
+import { ChangeUserRoleUseCase } from '../../../../application/users/use-cases/ChangeUserRoleUseCase';
+import { SuspendUserUseCase } from '../../../../application/users/use-cases/SuspendUserUseCase';
+import { UpdateUserProfileUseCase } from '../../../../application/users/use-cases/UpdateUserProfileUseCase';
 
-export class AdminController {
+export class UserController {
   private getAllUsersUseCase: GetAllUsersUseCase;
   private getUserByIdUseCase: GetUserByIdUseCase;
   private deleteUserUseCase: DeleteUserUseCase;
   private changeUserRoleUseCase: ChangeUserRoleUseCase;
   private suspendUserUseCase: SuspendUserUseCase;
+  private updateProfileUseCase: UpdateUserProfileUseCase;
 
   constructor() {
     const userRepository = new UserRepository();
+    const passwordService = new BcryptPasswordService();
 
     this.getAllUsersUseCase = new GetAllUsersUseCase(userRepository);
     this.getUserByIdUseCase = new GetUserByIdUseCase(userRepository);
     this.deleteUserUseCase = new DeleteUserUseCase(userRepository);
     this.changeUserRoleUseCase = new ChangeUserRoleUseCase(userRepository);
     this.suspendUserUseCase = new SuspendUserUseCase(userRepository);
+    this.updateProfileUseCase = new UpdateUserProfileUseCase(userRepository);
   }
 
-  async getAllUsers(req: Request, res: Response): Promise<void> {
+  async getAll(req: Request, res: Response): Promise<void> {
     try {
       const { empresaId, page, limit } = req.query;
       const result = await this.getAllUsersUseCase.execute(
@@ -37,7 +42,7 @@ export class AdminController {
     }
   }
 
-  async getUserById(req: Request, res: Response): Promise<void> {
+  async getById(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
       const user = await this.getUserByIdUseCase.execute(Number(id));
@@ -47,7 +52,20 @@ export class AdminController {
     }
   }
 
-  async deleteUser(req: Request, res: Response): Promise<void> {
+  async update(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const userId = Number(id);
+      const updateData = req.body;
+      
+      const updatedUser = await this.updateProfileUseCase.execute(userId, updateData);
+      res.status(200).json(updatedUser);
+    } catch (error: any) {
+      res.status(error.statusCode || 500).json({ error: error.message || 'Internal server error' });
+    }
+  }
+
+  async delete(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
       await this.deleteUserUseCase.execute(Number(id));
@@ -74,7 +92,7 @@ export class AdminController {
     }
   }
 
-  async suspendUser(req: Request, res: Response): Promise<void> {
+  async suspend(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
       const { reason } = req.body;
@@ -84,17 +102,5 @@ export class AdminController {
     } catch (error: any) {
       res.status(error.statusCode || 500).json({ error: error.message || 'Internal server error' });
     }
-  }
-
-  // Placeholder for other admin functionalities
-  async getDashboardStats(req: Request, res: Response): Promise<void> {
-    res.status(200).json({ 
-      message: 'Dashboard stats endpoint - to be implemented',
-      stats: {
-        totalUsers: 0,
-        totalTenants: 0,
-        activeSubscriptions: 0
-      }
-    });
   }
 }
