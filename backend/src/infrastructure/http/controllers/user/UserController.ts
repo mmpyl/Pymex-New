@@ -1,34 +1,33 @@
 import { Request, Response } from 'express';
-import { UserRepository } from '../../../repositories/user.repository';
-import { BcryptPasswordService } from '../../../services/BcryptPasswordService';
 import { GetAllUsersUseCase } from '../../../../application/users/use-cases/GetAllUsersUseCase';
 import { GetUserByIdUseCase } from '../../../../application/users/use-cases/GetUserByIdUseCase';
+import { UpdateUserProfileUseCase } from '../../../../application/users/use-cases/UpdateUserProfileUseCase';
 import { DeleteUserUseCase } from '../../../../application/users/use-cases/DeleteUserUseCase';
 import { ChangeUserRoleUseCase } from '../../../../application/users/use-cases/ChangeUserRoleUseCase';
 import { SuspendUserUseCase } from '../../../../application/users/use-cases/SuspendUserUseCase';
-import { UpdateUserProfileUseCase } from '../../../../application/users/use-cases/UpdateUserProfileUseCase';
+import { UserRepository } from '../../../repositories/user.repository';
+import { UpdateUserDto } from '../../../../application/users/dtos/UpdateUserDto';
+import { UserRoleType } from '../../../../domain/user/value-objects/UserRole';
 
 export class UserController {
   private getAllUsersUseCase: GetAllUsersUseCase;
   private getUserByIdUseCase: GetUserByIdUseCase;
-  private deleteUserUseCase: DeleteUserUseCase;
-  private changeUserRoleUseCase: ChangeUserRoleUseCase;
-  private suspendUserUseCase: SuspendUserUseCase;
   private updateProfileUseCase: UpdateUserProfileUseCase;
+  private deleteUserUseCase: DeleteUserUseCase;
+  private changeRoleUseCase: ChangeUserRoleUseCase;
+  private suspendUserUseCase: SuspendUserUseCase;
 
   constructor() {
     const userRepository = new UserRepository();
-    const passwordService = new BcryptPasswordService();
-
     this.getAllUsersUseCase = new GetAllUsersUseCase(userRepository);
     this.getUserByIdUseCase = new GetUserByIdUseCase(userRepository);
-    this.deleteUserUseCase = new DeleteUserUseCase(userRepository);
-    this.changeUserRoleUseCase = new ChangeUserRoleUseCase(userRepository);
-    this.suspendUserUseCase = new SuspendUserUseCase(userRepository);
     this.updateProfileUseCase = new UpdateUserProfileUseCase(userRepository);
+    this.deleteUserUseCase = new DeleteUserUseCase(userRepository);
+    this.changeRoleUseCase = new ChangeUserRoleUseCase(userRepository);
+    this.suspendUserUseCase = new SuspendUserUseCase(userRepository);
   }
 
-  async getAll(req: Request, res: Response): Promise<void> {
+  getAll = async (req: Request, res: Response): Promise<void> => {
     try {
       const { empresaId, page, limit } = req.query;
       const result = await this.getAllUsersUseCase.execute(
@@ -36,71 +35,125 @@ export class UserController {
         page ? Number(page) : 1,
         limit ? Number(limit) : 10
       );
-      res.status(200).json(result);
-    } catch (error: any) {
-      res.status(error.statusCode || 500).json({ error: error.message || 'Internal server error' });
-    }
-  }
-
-  async getById(req: Request, res: Response): Promise<void> {
-    try {
-      const { id } = req.params;
-      const user = await this.getUserByIdUseCase.execute(Number(id));
-      res.status(200).json(user);
-    } catch (error: any) {
-      res.status(error.statusCode || 500).json({ error: error.message || 'Internal server error' });
-    }
-  }
-
-  async update(req: Request, res: Response): Promise<void> {
-    try {
-      const { id } = req.params;
-      const userId = Number(id);
-      const updateData = req.body;
       
-      const updatedUser = await this.updateProfileUseCase.execute(userId, updateData);
-      res.status(200).json(updatedUser);
+      res.status(200).json({
+        success: true,
+        data: result
+      });
     } catch (error: any) {
-      res.status(error.statusCode || 500).json({ error: error.message || 'Internal server error' });
+      res.status(500).json({ error: error.message || 'Failed to get users' });
     }
-  }
+  };
 
-  async delete(req: Request, res: Response): Promise<void> {
+  getById = async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params;
-      await this.deleteUserUseCase.execute(Number(id));
-      res.status(204).send();
-    } catch (error: any) {
-      res.status(error.statusCode || 500).json({ error: error.message || 'Internal server error' });
-    }
-  }
-
-  async changeRole(req: Request, res: Response): Promise<void> {
-    try {
-      const { id } = req.params;
-      const { role } = req.body;
+      const result = await this.getUserByIdUseCase.execute(id);
       
-      if (!role) {
-        res.status(400).json({ error: 'Role is required' });
+      res.status(200).json({
+        success: true,
+        data: result
+      });
+    } catch (error: any) {
+      if (error.name === 'UserNotFoundError') {
+        res.status(404).json({ error: error.message });
         return;
       }
-
-      const updatedUser = await this.changeUserRoleUseCase.execute(Number(id), role);
-      res.status(200).json(updatedUser);
-    } catch (error: any) {
-      res.status(error.statusCode || 500).json({ error: error.message || 'Internal server error' });
+      res.status(500).json({ error: error.message || 'Failed to get user' });
     }
-  }
+  };
 
-  async suspend(req: Request, res: Response): Promise<void> {
+  update = async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params;
-      const { reason } = req.body;
+      const { nombre, email, rol, empresaId, estado } = req.body;
       
-      const updatedUser = await this.suspendUserUseCase.execute(Number(id), reason || 'No reason provided');
-      res.status(200).json(updatedUser);
+      const dto: UpdateUserDto = {
+        id,
+        nombre,
+        email,
+        rol,
+        empresaId,
+        estado
+      };
+      
+      const result = await this.updateProfileUseCase.execute(dto);
+      
+      res.status(200).json({
+        success: true,
+        data: result
+      });
     } catch (error: any) {
-      res.status(error.statusCode || 500).json({ error: error.message || 'Internal server error' });
+      if (error.name === 'UserNotFoundError') {
+        res.status(404).json({ error: error.message });
+        return;
+      }
+      if (error.message === 'Email already in use') {
+        res.status(409).json({ error: error.message });
+        return;
+      }
+      res.status(500).json({ error: error.message || 'Failed to update user' });
     }
-  }
+  };
+
+  delete = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      await this.deleteUserUseCase.execute(id);
+      
+      res.status(200).json({
+        success: true,
+        message: 'User deleted successfully'
+      });
+    } catch (error: any) {
+      if (error.name === 'UserNotFoundError') {
+        res.status(404).json({ error: error.message });
+        return;
+      }
+      res.status(500).json({ error: error.message || 'Failed to delete user' });
+    }
+  };
+
+  changeRole = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const { newRole } = req.body;
+      
+      if (!newRole) {
+        res.status(400).json({ error: 'newRole is required' });
+        return;
+      }
+      
+      const result = await this.changeRoleUseCase.execute(id, newRole as UserRoleType);
+      
+      res.status(200).json({
+        success: true,
+        data: result
+      });
+    } catch (error: any) {
+      if (error.name === 'UserNotFoundError') {
+        res.status(404).json({ error: error.message });
+        return;
+      }
+      res.status(500).json({ error: error.message || 'Failed to change role' });
+    }
+  };
+
+  suspend = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const result = await this.suspendUserUseCase.execute(id);
+      
+      res.status(200).json({
+        success: true,
+        data: result
+      });
+    } catch (error: any) {
+      if (error.name === 'UserNotFoundError') {
+        res.status(404).json({ error: error.message });
+        return;
+      }
+      res.status(500).json({ error: error.message || 'Failed to suspend user' });
+    }
+  };
 }

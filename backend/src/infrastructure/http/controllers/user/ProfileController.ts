@@ -1,53 +1,76 @@
 import { Request, Response } from 'express';
-import { UserRepository } from '../../../repositories/user.repository';
-import { BcryptPasswordService } from '../../../services/BcryptPasswordService';
-import { UpdateUserProfileUseCase } from '../../../../application/users/use-cases/UpdateUserProfileUseCase';
 import { GetUserByIdUseCase } from '../../../../application/users/use-cases/GetUserByIdUseCase';
+import { UpdateUserProfileUseCase } from '../../../../application/users/use-cases/UpdateUserProfileUseCase';
+import { UserRepository } from '../../../repositories/user.repository';
+import { UpdateUserDto } from '../../../../application/users/dtos/UpdateUserDto';
 
 export class ProfileController {
-  private updateProfileUseCase: UpdateUserProfileUseCase;
   private getUserByIdUseCase: GetUserByIdUseCase;
+  private updateProfileUseCase: UpdateUserProfileUseCase;
 
   constructor() {
     const userRepository = new UserRepository();
-    const passwordService = new BcryptPasswordService();
-
-    this.updateProfileUseCase = new UpdateUserProfileUseCase(userRepository);
     this.getUserByIdUseCase = new GetUserByIdUseCase(userRepository);
+    this.updateProfileUseCase = new UpdateUserProfileUseCase(userRepository);
   }
 
-  async getProfile(req: Request, res: Response): Promise<void> {
+  getProfile = async (req: Request, res: Response): Promise<void> => {
     try {
-      // Assuming user ID is available in req.user from auth middleware
-      const userId = (req.user as any)?.userId;
+      const userId = (req as any).user?.id;
       
       if (!userId) {
         res.status(401).json({ error: 'User not authenticated' });
         return;
       }
-
-      const user = await this.getUserByIdUseCase.execute(userId);
-      res.status(200).json(user);
+      
+      const result = await this.getUserByIdUseCase.execute(userId);
+      
+      res.status(200).json({
+        success: true,
+        data: result
+      });
     } catch (error: any) {
-      res.status(error.statusCode || 500).json({ error: error.message || 'Internal server error' });
+      if (error.name === 'UserNotFoundError') {
+        res.status(404).json({ error: error.message });
+        return;
+      }
+      res.status(500).json({ error: error.message || 'Failed to get profile' });
     }
-  }
+  };
 
-  async updateProfile(req: Request, res: Response): Promise<void> {
+  updateProfile = async (req: Request, res: Response): Promise<void> => {
     try {
-      // Assuming user ID is available in req.user from auth middleware
-      const userId = (req.user as any)?.userId;
+      const userId = (req as any).user?.id;
       
       if (!userId) {
         res.status(401).json({ error: 'User not authenticated' });
         return;
       }
-
-      const updateData = req.body;
-      const updatedUser = await this.updateProfileUseCase.execute(userId, updateData);
-      res.status(200).json(updatedUser);
+      
+      const { nombre, email } = req.body;
+      
+      const dto: UpdateUserDto = {
+        id: userId,
+        nombre,
+        email
+      };
+      
+      const result = await this.updateProfileUseCase.execute(dto);
+      
+      res.status(200).json({
+        success: true,
+        data: result
+      });
     } catch (error: any) {
-      res.status(error.statusCode || 500).json({ error: error.message || 'Internal server error' });
+      if (error.name === 'UserNotFoundError') {
+        res.status(404).json({ error: error.message });
+        return;
+      }
+      if (error.message === 'Email already in use') {
+        res.status(409).json({ error: error.message });
+        return;
+      }
+      res.status(500).json({ error: error.message || 'Failed to update profile' });
     }
-  }
+  };
 }
