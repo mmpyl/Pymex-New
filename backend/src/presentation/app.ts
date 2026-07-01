@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import { corsConfig } from '../config/cors';
 import { errorMiddleware } from '../infrastructure/http/middleware/error.middleware';
 import { authRoutes } from '../infrastructure/http/routes/auth.routes';
+import { userRoutes } from '../infrastructure/http/routes/user.routes';
 import { adminRoutes } from '../infrastructure/http/routes/admin.routes';
 import { swaggerUi, swaggerSpec } from '../infrastructure/http/swagger/swagger.config';
 
@@ -21,6 +22,7 @@ export const createApp = (): Application => {
   // API Routes
   app.use('/api/v1/auth', authRoutes);
   app.use('/api/v1/admin', adminRoutes);
+  app.use('/api/v1', userRoutes);
 
   // Swagger documentation
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
