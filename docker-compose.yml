@@ -16,7 +16,7 @@ services:
     networks:
       - pymex-network
     ports:
-      - "5432:5432"
+      - "5433:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-pymex}"]
       interval: 10s
@@ -34,7 +34,7 @@ services:
     networks:
       - pymex-network
     ports:
-      - "6379:6379"
+      - "6380:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -45,7 +45,7 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: docker/Dockerfile
+      dockerfile: Dockerfile
     container_name: pymex-backend
     restart: unless-stopped
     environment:
@@ -80,7 +80,7 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: docker/Dockerfile
+      dockerfile: Dockerfile
       target: development
     container_name: pymex-frontend
     restart: unless-stopped
@@ -101,7 +101,7 @@ services:
   ml-service:
     build:
       context: ./ml-service
-      dockerfile: docker/Dockerfile
+      dockerfile: Dockerfile
     container_name: pymex-ml-service
     restart: unless-stopped
     environment:
@@ -121,7 +121,7 @@ services:
   facturacion-service:
     build:
       context: ./facturacion-service
-      dockerfile: docker/Dockerfile
+      dockerfile: Dockerfile
     container_name: pymex-facturacion
     restart: unless-stopped
     environment:
