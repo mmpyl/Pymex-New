@@ -46,10 +46,16 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      target: production
+
+    command: ["npm", "run", "start"]
+
     container_name: pymex-backend
     restart: unless-stopped
+
     environment:
-      NODE_ENV: ${NODE_ENV:-development}
+      NODE_ENV: production
+
       DB_HOST: postgres
       DB_PORT: 5432
       DB_USER: ${DB_USER:-pymex}
@@ -64,9 +70,16 @@ services:
       MAIL_USER: ${MAIL_USER:-}
       MAIL_PASS: ${MAIL_PASS:-}
     volumes:
-      - ./backend:/app
+      # En producción no montamos el código para evitar pisar el build de la imagen
+      # - ./backend:/app
       - backend_node_modules:/app/node_modules
+      - type: bind
+        source: ./backend/dist
+        target: /app/dist
+        read_only: true
+
     ports:
+
       - "3000:3000"
     depends_on:
       postgres:
@@ -81,7 +94,8 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      target: development
+      target: production
+
     container_name: pymex-frontend
     restart: unless-stopped
     environment:
@@ -154,12 +168,12 @@ services:
       - ./frontend/dist:/usr/share/nginx/html
     ports:
       - "80:80"
-      - "443:443"
     depends_on:
       - backend
       - frontend
     networks:
       - pymex-network
+
 
 networks:
   pymex-network:
