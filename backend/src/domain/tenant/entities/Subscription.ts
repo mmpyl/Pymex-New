@@ -1,5 +1,5 @@
-import { TenantId } from './value-objects/TenantId';
-import { PlanType, PlanTypeValue } from './value-objects/PlanType';
+import { TenantId } from '../value-objects/TenantId';
+import { PlanType } from '../value-objects/PlanType';
 
 export interface SubscriptionProps {
   id: string;

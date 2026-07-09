@@ -31,7 +31,7 @@ export class AuthMapper {
       },
       accessToken,
       refreshToken,
-      expiresIn,
+      expiresIn: 3600,
     };
   }
 
@@ -45,7 +45,7 @@ export class AuthMapper {
       password: Password.fromHash(String(model.password)),
       rol: UserRole.create(model.rol as any),
       empresaId: model.empresaId,
-      estado: parseEstado(model.estado),
+      estado: model.estado as 'activo' | 'inactivo' | 'suspendido',
       fechaRegistro: model.fechaRegistro,
 
     });

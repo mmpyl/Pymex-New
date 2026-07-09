@@ -1,50 +1,28 @@
 import { RefreshTokenDto } from '../dtos/RefreshTokenDto';
 import { AuthResponseDto } from '../dtos/AuthResponseDto';
-import jwt, { type Secret, type SignOptions } from 'jsonwebtoken';
-
-
-interface JwtPayload {
-  id: string;
-  email: string;
-  rol: string;
-  empresaId?: number;
-}
+import { JwtService, JwtPayload } from '../../../infrastructure/services/JwtService';
 
 export class RefreshTokenUseCase {
-  constructor(
-    private jwtSecret: string,
-    private jwtExpiresIn: string = '15m',
-    private jwtRefreshExpiresIn: string = '7d'
-  ) {}
-
   async execute(dto: RefreshTokenDto): Promise<AuthResponseDto> {
     try {
-      const decoded = jwt.verify(dto.refreshToken, this.jwtSecret) as JwtPayload;
+      const decoded = JwtService.verifyRefreshToken(dto.refreshToken);
 
       const userData = {
-        id: decoded.id,
+        id: decoded.userId,
         email: decoded.email,
         rol: decoded.rol,
         empresaId: decoded.empresaId
       };
 
-      const secret = this.jwtSecret as Secret;
-
-      const accessToken = jwt.sign(userData, secret, {
-        expiresIn: this.jwtExpiresIn
-      } as SignOptions);
-
-      const refreshToken = jwt.sign(userData, secret, {
-        expiresIn: this.jwtRefreshExpiresIn
-      } as SignOptions);
-
+      const accessToken = JwtService.generateAccessToken(userData);
+      const refreshToken = JwtService.generateRefreshToken(userData);
 
       return {
         accessToken,
         refreshToken,
-        expiresIn: parseInt(this.jwtExpiresIn) * 60,
+        expiresIn: 3600,
         user: {
-          id: decoded.id,
+          id: decoded.userId,
           nombre: '', 
           email: decoded.email,
           rol: decoded.rol,

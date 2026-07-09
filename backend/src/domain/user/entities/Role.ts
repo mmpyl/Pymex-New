@@ -1,5 +1,3 @@
-import { UserRoleType } from './value-objects/UserRole';
-
 export interface RoleProps {
   id: number;
   nombre: string;

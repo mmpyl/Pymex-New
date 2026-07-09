@@ -1,6 +1,5 @@
 import { UserId } from '../../user/value-objects/UserId';
-import { TenantId } from './value-objects/TenantId';
-import { UserRoleType } from '../../user/value-objects/UserRole';
+import { TenantId } from '../value-objects/TenantId';
 
 export type MemberRole = 'owner' | 'admin' | 'member' | 'viewer';
 
