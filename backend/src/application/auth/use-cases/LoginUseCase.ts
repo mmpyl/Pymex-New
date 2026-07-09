@@ -5,6 +5,7 @@ import { IPasswordService } from '../../../domain/user/services/IPasswordService
 import { InvalidCredentialsError } from '../../../domain/user/errors/InvalidCredentialsError';
 import { JwtService } from '../../../infrastructure/services/JwtService';
 
+
 export class LoginUseCase {
   constructor(
     private userRepository: IUserRepository,
@@ -12,6 +13,7 @@ export class LoginUseCase {
   ) {}
 
   async execute(dto: LoginDto): Promise<AuthResponseDto> {
+
     const user = await this.userRepository.findByEmail(dto.email);
     
     if (!user) {
@@ -51,8 +53,8 @@ export class LoginUseCase {
         nombre: user.getNombre(),
         email: user.getEmail().getValue(),
         rol: user.getRol().getValue(),
-        empresaId: user.getEmpresaId()
-      }
+        empresaId: user.getEmpresaId(),
+      },
     };
   }
 }

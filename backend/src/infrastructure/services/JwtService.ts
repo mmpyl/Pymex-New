@@ -1,4 +1,5 @@
-import jwt from 'jsonwebtoken';
+import jwt, { type Secret, type SignOptions } from 'jsonwebtoken';
+
 import { env } from '../../config/env';
 
 export interface JwtPayload {
@@ -19,6 +20,7 @@ export class JwtService {
       expiresIn: env.JWT_REFRESH_EXPIRES_IN as string | number,
     });
   }
+
 
   static verifyAccessToken(token: string): JwtPayload {
     try {

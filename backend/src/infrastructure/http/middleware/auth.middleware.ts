@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { JwtService, JwtPayload } from '../services/JwtService';
+import { JwtService, JwtPayload } from '../../services/JwtService';
+
 
 export interface AuthRequest extends Request {
   user?: JwtPayload;
@@ -24,7 +25,7 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
   }
 };
 
-export const optionalAuthMiddleware = (req: AuthRequest, res: Response, next: NextFunction): void => {
+export const optionalAuthMiddleware = (req: AuthRequest, _res: Response, next: NextFunction): void => {
   try {
     const authHeader = req.headers.authorization;
     

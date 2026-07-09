@@ -16,7 +16,7 @@ services:
     networks:
       - pymex-network
     ports:
-      - "5432:5432"
+      - "5433:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-pymex}"]
       interval: 10s
@@ -34,7 +34,7 @@ services:
     networks:
       - pymex-network
     ports:
-      - "6379:6379"
+      - "6380:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -45,11 +45,20 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: docker/Dockerfile
+      dockerfile: Dockerfile
+      target: development
+
+    command: ["npm", "run", "dev"]
+
+
+
     container_name: pymex-backend
     restart: unless-stopped
+
     environment:
-      NODE_ENV: ${NODE_ENV:-development}
+      NODE_ENV: development
+
+
       DB_HOST: postgres
       DB_PORT: 5432
       DB_USER: ${DB_USER:-pymex}
@@ -64,9 +73,16 @@ services:
       MAIL_USER: ${MAIL_USER:-}
       MAIL_PASS: ${MAIL_PASS:-}
     volumes:
+      # En producción no montamos el código para evitar pisar el build de la imagen
+      # - ./backend:/app
+      - backend_node_modules:/app/node_modules
+      # En desarrollo, montamos el código para que ts-node tenga acceso a las fuentes.
       - ./backend:/app
       - backend_node_modules:/app/node_modules
+
+
     ports:
+
       - "3000:3000"
     depends_on:
       postgres:
@@ -80,8 +96,9 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: docker/Dockerfile
-      target: development
+      dockerfile: Dockerfile
+      target: production
+
     container_name: pymex-frontend
     restart: unless-stopped
     environment:
@@ -101,7 +118,7 @@ services:
   ml-service:
     build:
       context: ./ml-service
-      dockerfile: docker/Dockerfile
+      dockerfile: Dockerfile
     container_name: pymex-ml-service
     restart: unless-stopped
     environment:
@@ -121,7 +138,7 @@ services:
   facturacion-service:
     build:
       context: ./facturacion-service
-      dockerfile: docker/Dockerfile
+      dockerfile: Dockerfile
     container_name: pymex-facturacion
     restart: unless-stopped
     environment:
@@ -154,12 +171,12 @@ services:
       - ./frontend/dist:/usr/share/nginx/html
     ports:
       - "80:80"
-      - "443:443"
     depends_on:
       - backend
       - frontend
     networks:
       - pymex-network
+
 
 networks:
   pymex-network:

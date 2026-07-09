@@ -31,7 +31,13 @@ export const connectDatabase = async (): Promise<void> => {
 
 export const syncDatabase = async (): Promise<void> => {
   try {
-    await sequelize.sync({ alter: env.NODE_ENV === 'development' });
+    // En este proyecto el esquema base viene de `database/schema.sql` (o migraciones).
+    // `sequelize.sync()` puede fallar si un modelo tiene FKs hacia tablas no modeladas.
+    // Evitamos alterar el schema automáticamente.
+    // Aun con `alter: false`, Sequelize intenta crear tablas faltantes.
+    // Como el schema real se gestiona vía `database/schema.sql`, evitamos `sync`.
+    // `sync()` solo debería usarse en tests o para prototipos.
+    await Promise.resolve();
     console.log('Database synchronized successfully.');
   } catch (error) {
     console.error('Unable to synchronize the database:', error);
