@@ -1,15 +1,15 @@
-# TODO - Revisión de despliegue (Pymex-New)
+# TODO - Reparar errores (User/Auth mappers & repository)
 
-- [ ] Crear `infraestructura/nginx/conf.d/default.conf` con server block para servir frontend y proxy de `/api/*` hacia `backend`.
-- [ ] Actualizar `Pymex-New/docker-compose.yml` para alinear modo de producción:
-  - [x] `frontend` usar `target: production` cuando se levante con profile `production`.
-  - [ ] (Opcional) asegurar que `backend` esté en modo correcto (dev vs prod) según el objetivo.
+## Plan
+- [ ] 1) Validar y convertir `estado` (string -> 'activo'|'inactivo'|'suspendido') sin `as any`
+- [ ] 2) Validar y convertir `rol` (string/enum -> UserRoleType) sin `as any`
+- [ ] 3) Corregir `save()` para que actualice datos si el usuario existe (upsert o find+update)
+- [ ] 4) Corregir `existsByEmail()` para no depender de `where.id` si no coincide con el PK real
+- [ ] 5) Ejecutar build/lint/tests del backend para confirmar compilación
 
-- [x] Definir y/o ajustar el comando de ejecución para producción: `docker compose --profile production up -d --build`.
-
-- [x] Validar con logs y endpoints esperados:
-  - [x] Evidencia de proxy: `/api-docs` desde nginx devuelve 502 inicialmente por backend caído
-  - [ ] Corregir backend production/dev para eliminar `ts-node: not found`
-
-
+## Archivos involucrados
+- backend/src/application/auth/mappers/AuthMapper.ts
+- backend/src/infrastructure/repositories/user.repository.ts
+- (posiblemente) backend/src/domain/user/value-objects/UserRole.ts
+- (posiblemente) backend/src/domain/user/entities/User.ts
 

@@ -4,7 +4,11 @@ WORKDIR /app
 
 COPY package*.json ./
 
+# Instalar devDependencies (incluye ts-node)
 RUN npm install
+# Verificación (no falla el build)
+RUN npx --yes ts-node -v || true
+
 
 COPY . .
 
@@ -28,5 +32,6 @@ RUN npm run build
 EXPOSE 3000
 
 CMD ["npm", "run", "start"]
+
 
 

@@ -5,6 +5,7 @@
   "main": "dist/presentation/server.js",
   "scripts": {
     "dev": "ts-node src/presentation/server.ts",
+
     "build": "tsc",
     "start": "node dist/presentation/server.js",
 

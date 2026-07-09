@@ -1,7 +1,7 @@
-import { UserId } from './value-objects/UserId';
-import { Email } from './value-objects/Email';
-import { Password } from './value-objects/Password';
-import { UserRole, UserRoleType } from './value-objects/UserRole';
+import { UserId } from '../value-objects/UserId';
+import { Email } from '../value-objects/Email';
+import { Password } from '../value-objects/Password';
+import { UserRole, UserRoleType } from '../value-objects/UserRole';
 
 export interface UserProps {
   id: UserId;
@@ -18,6 +18,7 @@ export class User {
   private constructor(private props: UserProps) {}
 
   static create(props: Omit<UserProps, 'id' | 'fechaRegistro'>): User {
+
     const id = UserId.create();
     const fechaRegistro = new Date();
     
@@ -56,9 +57,10 @@ export class User {
     return this.props.empresaId;
   }
 
-  getEstado(): string {
+  getEstado(): UserProps['estado'] {
     return this.props.estado;
   }
+
 
   getFechaRegistro(): Date {
     return this.props.fechaRegistro;
@@ -68,32 +70,33 @@ export class User {
     if (!nombre || nombre.trim().length === 0) {
       throw new Error('Nombre is required');
     }
-    this.props.nombre = nombre.trim();
+    this.props = { ...this.props, nombre: nombre.trim() };
   }
 
   updateEmail(email: string): void {
-    this.props.email = Email.create(email);
+    this.props = { ...this.props, email: Email.create(email) };
   }
 
   updatePassword(password: string): void {
-    this.props.password = Password.create(password);
+    this.props = { ...this.props, password: Password.create(password) };
   }
 
   updateRol(rol: UserRoleType): void {
-    this.props.rol = UserRole.create(rol);
+    this.props = { ...this.props, rol: UserRole.create(rol) };
   }
 
   activate(): void {
-    this.props.estado = 'activo';
+    this.props = { ...this.props, estado: 'activo' };
   }
 
   deactivate(): void {
-    this.props.estado = 'inactivo';
+    this.props = { ...this.props, estado: 'inactivo' };
   }
 
   suspend(): void {
-    this.props.estado = 'suspendido';
+    this.props = { ...this.props, estado: 'suspendido' };
   }
+
 
   isActive(): boolean {
     return this.props.estado === 'activo';

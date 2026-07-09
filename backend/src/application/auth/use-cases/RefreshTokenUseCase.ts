@@ -1,6 +1,7 @@
 import { RefreshTokenDto } from '../dtos/RefreshTokenDto';
 import { AuthResponseDto } from '../dtos/AuthResponseDto';
-import jwt from 'jsonwebtoken';
+import jwt, { type Secret, type SignOptions } from 'jsonwebtoken';
+
 
 interface JwtPayload {
   id: string;
@@ -27,13 +28,16 @@ export class RefreshTokenUseCase {
         empresaId: decoded.empresaId
       };
 
-      const accessToken = jwt.sign(userData, this.jwtSecret, {
-        expiresIn: this.jwtExpiresIn
-      });
+      const secret = this.jwtSecret as Secret;
 
-      const refreshToken = jwt.sign(userData, this.jwtSecret, {
+      const accessToken = jwt.sign(userData, secret, {
+        expiresIn: this.jwtExpiresIn
+      } as SignOptions);
+
+      const refreshToken = jwt.sign(userData, secret, {
         expiresIn: this.jwtRefreshExpiresIn
-      });
+      } as SignOptions);
+
 
       return {
         accessToken,

@@ -86,7 +86,7 @@ export class AuthController {
     }
   };
 
-  logout = async (req: Request, res: Response): Promise<void> => {
+  logout = async (_req: Request, res: Response): Promise<void> => {
     try {
       await this.logoutUseCase.execute();
       res.status(200).json({

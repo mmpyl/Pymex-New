@@ -77,7 +77,7 @@ export class UserController {
         estado
       };
       
-      const result = await this.updateProfileUseCase.execute(dto);
+const result = await this.updateProfileUseCase.execute(Number(id), dto);
       
       res.status(200).json({
         success: true,

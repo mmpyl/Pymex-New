@@ -2,9 +2,10 @@ import { LoginDto } from '../dtos/LoginDto';
 import { AuthResponseDto } from '../dtos/AuthResponseDto';
 import { IUserRepository } from '../../../domain/user/repositories/IUserRepository';
 import { IPasswordService } from '../../../domain/user/services/IPasswordService';
-import { UserNotFoundError } from '../../../domain/user/errors/UserNotFoundError';
+
 import { InvalidCredentialsError } from '../../../domain/user/errors/InvalidCredentialsError';
 import jwt from 'jsonwebtoken';
+
 
 export class LoginUseCase {
   constructor(
@@ -16,6 +17,7 @@ export class LoginUseCase {
   ) {}
 
   async execute(dto: LoginDto): Promise<AuthResponseDto> {
+
     const user = await this.userRepository.findByEmail(dto.email);
     
     if (!user) {
@@ -43,13 +45,17 @@ export class LoginUseCase {
       empresaId: user.getEmpresaId()
     };
 
-    const accessToken = jwt.sign(userData, this.jwtSecret, {
-      expiresIn: this.jwtExpiresIn
-    });
+    const accessToken = jwt.sign(
+      userData,
+      this.jwtSecret,
+      { expiresIn: this.jwtExpiresIn } as any,
+    );
 
-    const refreshToken = jwt.sign(userData, this.jwtSecret, {
-      expiresIn: this.jwtRefreshExpiresIn
-    });
+    const refreshToken = jwt.sign(
+      userData,
+      this.jwtSecret,
+      { expiresIn: this.jwtRefreshExpiresIn } as any,
+    );
 
     return {
       accessToken,
@@ -60,8 +66,8 @@ export class LoginUseCase {
         nombre: user.getNombre(),
         email: user.getEmail().getValue(),
         rol: user.getRol().getValue(),
-        empresaId: user.getEmpresaId()
-      }
+        empresaId: user.getEmpresaId(),
+      },
     };
   }
 }

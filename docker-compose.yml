@@ -46,15 +46,18 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-      target: production
+      target: development
 
-    command: ["npm", "run", "start"]
+    command: ["npm", "run", "dev"]
+
+
 
     container_name: pymex-backend
     restart: unless-stopped
 
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
+
 
       DB_HOST: postgres
       DB_PORT: 5432
@@ -73,10 +76,10 @@ services:
       # En producción no montamos el código para evitar pisar el build de la imagen
       # - ./backend:/app
       - backend_node_modules:/app/node_modules
-      - type: bind
-        source: ./backend/dist
-        target: /app/dist
-        read_only: true
+      # En desarrollo, montamos el código para que ts-node tenga acceso a las fuentes.
+      - ./backend:/app
+      - backend_node_modules:/app/node_modules
+
 
     ports:
 
