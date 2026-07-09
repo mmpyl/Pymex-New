@@ -6,15 +6,12 @@ import { User } from '../../../domain/user/entities/User';
 import { Email } from '../../../domain/user/value-objects/Email';
 import { Password } from '../../../domain/user/value-objects/Password';
 import { UserRole } from '../../../domain/user/value-objects/UserRole';
-import jwt from 'jsonwebtoken';
+import { JwtService } from '../../../infrastructure/services/JwtService';
 
 export class RegisterUserUseCase {
   constructor(
     private userRepository: IUserRepository,
-    private passwordService: IPasswordService,
-    private jwtSecret: string,
-    private jwtExpiresIn: string = '15m',
-    private jwtRefreshExpiresIn: string = '7d'
+    private passwordService: IPasswordService
   ) {}
 
   async execute(dto: RegisterDto): Promise<AuthResponseDto> {
@@ -45,18 +42,13 @@ export class RegisterUserUseCase {
       empresaId: user.getEmpresaId()
     };
 
-    const accessToken = jwt.sign(userData, this.jwtSecret, {
-      expiresIn: this.jwtExpiresIn
-    });
-
-    const refreshToken = jwt.sign(userData, this.jwtSecret, {
-      expiresIn: this.jwtRefreshExpiresIn
-    });
+    const accessToken = JwtService.generateAccessToken(userData);
+    const refreshToken = JwtService.generateRefreshToken(userData);
 
     return {
       accessToken,
       refreshToken,
-      expiresIn: parseInt(this.jwtExpiresIn) * 60,
+      expiresIn: 3600,
       user: {
         id: userId,
         nombre: user.getNombre(),

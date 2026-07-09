@@ -1,8 +1,8 @@
-import { TenantId } from './value-objects/TenantId';
-import { TenantName } from './value-objects/TenantName';
-import { TenantStatus } from './value-objects/TenantStatus';
-import { TaxProfile } from './value-objects/TaxProfile';
-import { PlanType } from './value-objects/PlanType';
+import { TenantId } from '../value-objects/TenantId';
+import { TenantName } from '../value-objects/TenantName';
+import { TenantStatus } from '../value-objects/TenantStatus';
+import { TaxProfile } from '../value-objects/TaxProfile';
+import { PlanType } from '../value-objects/PlanType';
 
 export interface TenantProps {
   id: TenantId;

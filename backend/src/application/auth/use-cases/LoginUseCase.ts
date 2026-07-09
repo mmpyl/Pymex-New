@@ -2,17 +2,13 @@ import { LoginDto } from '../dtos/LoginDto';
 import { AuthResponseDto } from '../dtos/AuthResponseDto';
 import { IUserRepository } from '../../../domain/user/repositories/IUserRepository';
 import { IPasswordService } from '../../../domain/user/services/IPasswordService';
-import { UserNotFoundError } from '../../../domain/user/errors/UserNotFoundError';
 import { InvalidCredentialsError } from '../../../domain/user/errors/InvalidCredentialsError';
-import jwt from 'jsonwebtoken';
+import { JwtService } from '../../../infrastructure/services/JwtService';
 
 export class LoginUseCase {
   constructor(
     private userRepository: IUserRepository,
-    private passwordService: IPasswordService,
-    private jwtSecret: string,
-    private jwtExpiresIn: string = '15m',
-    private jwtRefreshExpiresIn: string = '7d'
+    private passwordService: IPasswordService
   ) {}
 
   async execute(dto: LoginDto): Promise<AuthResponseDto> {
@@ -43,18 +39,13 @@ export class LoginUseCase {
       empresaId: user.getEmpresaId()
     };
 
-    const accessToken = jwt.sign(userData, this.jwtSecret, {
-      expiresIn: this.jwtExpiresIn
-    });
-
-    const refreshToken = jwt.sign(userData, this.jwtSecret, {
-      expiresIn: this.jwtRefreshExpiresIn
-    });
+    const accessToken = JwtService.generateAccessToken(userData);
+    const refreshToken = JwtService.generateRefreshToken(userData);
 
     return {
       accessToken,
       refreshToken,
-      expiresIn: parseInt(this.jwtExpiresIn) * 60,
+      expiresIn: 3600,
       user: {
         id: userId,
         nombre: user.getNombre(),

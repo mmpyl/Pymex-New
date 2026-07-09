@@ -1,62 +1,45 @@
-# Compiled and build artifacts
-*.pyc
-__pycache__/
-*.o
-*.obj
-*.class
-*.exe
-*.dll
-*.so
-*.a
-*.out
+```
+# Build artifacts
+backend/dist/
 
 # Dependencies
 node_modules/
-venv/
-.venv/
+
+# Environment variables
 .env
 .env.local
 .env.*
 
-# Build directories
-dist/
-build/
-target/
-.gradle/
+# IDE files
+.vscode/
+.idea/
 
-# Python specific
-*.pyc
-__pycache__/
-*.pyo
-*.pyd
-.Python
-*.so
-.Python
-*.egg-info/
-.eggs/
-.mypy_cache/
-.pytest_cache/
-.coverage
+# Logs
+*.log
+
+# Coverage reports
 coverage/
 htmlcov/
+.coverage
 
-# Logs and temp files
-*.log
+# Temporary files
 *.tmp
 *.swp
 *.swo
 
-# Editors
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS generated files
+# OS specific
 .DS_Store
 Thumbs.db
 
-# Compressed files
+# Python related (if any Python in backend)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Compression files
 *.zip
 *.gz
 *.tar
@@ -79,3 +62,22 @@ Thumbs.db
 *.tar.bz2
 *.tar.xz
 *.tar.zst
+
+# MyPy cache
+.mypy_cache/
+
+# Pytest cache
+.pytest_cache/
+
+# Gradle
+.gradle/
+
+# Target (Maven, Rust, etc.)
+target/
+
+# Julia packages
+julia-*/
+
+# Zig cache
+zig-cache/
+```

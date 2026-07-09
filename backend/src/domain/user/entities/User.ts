@@ -1,7 +1,7 @@
-import { UserId } from './value-objects/UserId';
-import { Email } from './value-objects/Email';
-import { Password } from './value-objects/Password';
-import { UserRole, UserRoleType } from './value-objects/UserRole';
+import { UserId } from '../value-objects/UserId';
+import { Email } from '../value-objects/Email';
+import { Password } from '../value-objects/Password';
+import { UserRole, UserRoleType } from '../value-objects/UserRole';
 
 export interface UserProps {
   id: UserId;

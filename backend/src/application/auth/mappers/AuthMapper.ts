@@ -11,10 +11,10 @@ export class AuthMapper {
         email: user.getEmail().getValue(),
         rol: user.getRol().getValue(),
         empresaId: user.getEmpresaId(),
-        estado: user.getEstado(),
       },
       accessToken,
       refreshToken,
+      expiresIn: 3600,
     };
   }
 
@@ -26,7 +26,7 @@ export class AuthMapper {
       password: model.password,
       rol: model.rol,
       empresaId: model.empresaId,
-      estado: model.estado,
+      estado: model.estado as 'activo' | 'inactivo' | 'suspendido',
       fechaRegistro: model.fechaRegistro,
     });
   }

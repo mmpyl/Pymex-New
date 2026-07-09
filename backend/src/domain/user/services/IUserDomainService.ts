@@ -1,3 +1,5 @@
+import { User } from '../entities/User';
+
 export interface IUserDomainService {
   createUser(
     nombre: string,
