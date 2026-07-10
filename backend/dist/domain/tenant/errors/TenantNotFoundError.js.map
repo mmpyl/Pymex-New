@@ -1,0 +1,1 @@
+{"version":3,"file":"TenantNotFoundError.js","sourceRoot":"","sources":["../../../../src/domain/tenant/errors/TenantNotFoundError.ts"],"names":[],"mappings":";;;AAAA,MAAa,mBAAoB,SAAQ,KAAK;IAC5C,YAAY,QAAiB;QAC3B,KAAK,CAAC,QAAQ,CAAC,CAAC,CAAC,kBAAkB,QAAQ,YAAY,CAAC,CAAC,CAAC,kBAAkB,CAAC,CAAC;QAC9E,IAAI,CAAC,IAAI,GAAG,qBAAqB,CAAC;IACpC,CAAC;CACF;AALD,kDAKC"}

@@ -1,0 +1,1 @@
+{"version":3,"file":"TenantNotFoundError.d.ts","sourceRoot":"","sources":["../../../../src/domain/tenant/errors/TenantNotFoundError.ts"],"names":[],"mappings":"AAAA,qBAAa,mBAAoB,SAAQ,KAAK;gBAChC,QAAQ,CAAC,EAAE,MAAM;CAI9B"}

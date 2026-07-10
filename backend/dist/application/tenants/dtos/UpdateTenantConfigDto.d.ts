@@ -1,0 +1,1 @@
+//# sourceMappingURL=UpdateTenantConfigDto.d.ts.map

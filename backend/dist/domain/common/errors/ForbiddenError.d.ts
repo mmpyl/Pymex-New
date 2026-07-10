@@ -1,0 +1,1 @@
+//# sourceMappingURL=ForbiddenError.d.ts.map
