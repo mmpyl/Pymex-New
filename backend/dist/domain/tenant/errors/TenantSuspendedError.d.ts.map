@@ -1,0 +1,1 @@
+{"version":3,"file":"TenantSuspendedError.d.ts","sourceRoot":"","sources":["../../../../src/domain/tenant/errors/TenantSuspendedError.ts"],"names":[],"mappings":"AAAA,qBAAa,oBAAqB,SAAQ,KAAK;gBACjC,QAAQ,CAAC,EAAE,MAAM;CAI9B"}

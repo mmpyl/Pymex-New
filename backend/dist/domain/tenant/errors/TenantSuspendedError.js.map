@@ -1,0 +1,1 @@
+{"version":3,"file":"TenantSuspendedError.js","sourceRoot":"","sources":["../../../../src/domain/tenant/errors/TenantSuspendedError.ts"],"names":[],"mappings":";;;AAAA,MAAa,oBAAqB,SAAQ,KAAK;IAC7C,YAAY,QAAiB;QAC3B,KAAK,CAAC,QAAQ,CAAC,CAAC,CAAC,kBAAkB,QAAQ,eAAe,CAAC,CAAC,CAAC,qBAAqB,CAAC,CAAC;QACpF,IAAI,CAAC,IAAI,GAAG,sBAAsB,CAAC;IACrC,CAAC;CACF;AALD,oDAKC"}

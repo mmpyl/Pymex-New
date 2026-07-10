@@ -1,0 +1,1 @@
+{"version":3,"file":"ChangeRoleDto.d.ts","sourceRoot":"","sources":["../../../../src/application/users/dtos/ChangeRoleDto.ts"],"names":[],"mappings":"AAAA,MAAM,WAAW,aAAa;IAC5B,MAAM,EAAE,MAAM,CAAC;IACf,OAAO,EAAE,aAAa,GAAG,OAAO,GAAG,SAAS,GAAG,SAAS,GAAG,UAAU,GAAG,UAAU,CAAC;CACpF"}

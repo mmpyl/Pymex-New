@@ -1,0 +1,1 @@
+//# sourceMappingURL=InventoryItem.d.ts.map

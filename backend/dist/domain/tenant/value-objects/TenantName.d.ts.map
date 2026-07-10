@@ -1,0 +1,1 @@
+{"version":3,"file":"TenantName.d.ts","sourceRoot":"","sources":["../../../../src/domain/tenant/value-objects/TenantName.ts"],"names":[],"mappings":"AAAA,qBAAa,UAAU;IACD,OAAO,CAAC,QAAQ,CAAC,KAAK;IAA1C,OAAO;IAEP,MAAM,CAAC,MAAM,CAAC,IAAI,EAAE,MAAM,GAAG,UAAU;IAkBvC,QAAQ,IAAI,MAAM;IAIlB,MAAM,CAAC,KAAK,EAAE,UAAU,GAAG,OAAO;CAGnC"}
