@@ -4,11 +4,8 @@ WORKDIR /app
 
 COPY package*.json ./
 
-# Instalar devDependencies (incluye ts-node)
+# Instalar todas las dependencias (incluye devDependencies como ts-node)
 RUN npm install
-# Verificación (no falla el build)
-RUN npx --yes ts-node -v || true
-
 
 COPY . .
 
@@ -27,7 +24,11 @@ RUN npm ci --omit=dev
 
 COPY . .
 
+# Compilar TypeScript a JavaScript
 RUN npm run build
+
+# Eliminar dependencias de desarrollo después del build (si quedaron)
+RUN npm prune --production
 
 EXPOSE 3000
 
