@@ -55,7 +55,7 @@ export class ProfileController {
         email
       };
       
-      const result = await this.updateProfileUseCase.execute(dto);
+      const result = await this.updateProfileUseCase.execute(userId, dto);
       
       res.status(200).json({
         success: true,

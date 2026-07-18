@@ -1,4 +1,4 @@
-import jwt, { type Secret, type SignOptions } from 'jsonwebtoken';
+import jwt, { type SignOptions } from 'jsonwebtoken';
 
 import { env } from '../../config/env';
 
@@ -6,19 +6,22 @@ export interface JwtPayload {
   userId: string;
   email: string;
   rol: string;
+  empresaId?: number;
 }
 
 export class JwtService {
   static generateAccessToken(payload: JwtPayload): string {
-    return jwt.sign(payload, env.JWT_SECRET, {
+    const options: jwt.SignOptions = {
       expiresIn: env.JWT_EXPIRES_IN as string | number,
-    });
+    };
+    return jwt.sign(payload, env.JWT_SECRET, options);
   }
 
   static generateRefreshToken(payload: JwtPayload): string {
-    return jwt.sign(payload, env.JWT_REFRESH_SECRET, {
+    const options: jwt.SignOptions = {
       expiresIn: env.JWT_REFRESH_EXPIRES_IN as string | number,
-    });
+    };
+    return jwt.sign(payload, env.JWT_REFRESH_SECRET, options);
   }
 
 

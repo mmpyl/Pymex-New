@@ -9,7 +9,7 @@ class DeleteUserUseCase {
     async execute(id) {
         const user = await this.userRepository.findById(id);
         if (!user) {
-            throw new UserNotFoundError_1.UserNotFoundError();
+            throw new UserNotFoundError_1.UserNotFoundError(id);
         }
         await this.userRepository.delete(id);
     }

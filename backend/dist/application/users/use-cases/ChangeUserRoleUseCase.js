@@ -10,7 +10,7 @@ class ChangeUserRoleUseCase {
     async execute(userId, newRole) {
         const user = await this.userRepository.findById(userId);
         if (!user) {
-            throw new UserNotFoundError_1.UserNotFoundError();
+            throw new UserNotFoundError_1.UserNotFoundError(userId);
         }
         user.updateRol(newRole);
         await this.userRepository.update(user);

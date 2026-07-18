@@ -1,6 +1,6 @@
 import { RefreshTokenDto } from '../dtos/RefreshTokenDto';
 import { AuthResponseDto } from '../dtos/AuthResponseDto';
-import { JwtService, JwtPayload } from '../../../infrastructure/services/JwtService';
+import { JwtService } from '../../../infrastructure/services/JwtService';
 
 export class RefreshTokenUseCase {
   async execute(dto: RefreshTokenDto): Promise<AuthResponseDto> {
@@ -8,6 +8,7 @@ export class RefreshTokenUseCase {
       const decoded = JwtService.verifyRefreshToken(dto.refreshToken);
 
       const userData = {
+        userId: decoded.userId,
         id: decoded.userId,
         email: decoded.email,
         rol: decoded.rol,

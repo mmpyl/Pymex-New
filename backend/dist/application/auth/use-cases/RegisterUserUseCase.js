@@ -28,6 +28,7 @@ class RegisterUserUseCase {
         await this.userRepository.save(user);
         const userId = user.getId().getValue();
         const userData = {
+            userId,
             id: userId,
             email: user.getEmail().getValue(),
             rol: user.getRol().getValue(),

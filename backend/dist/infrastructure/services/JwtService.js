@@ -8,14 +8,16 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const env_1 = require("../../config/env");
 class JwtService {
     static generateAccessToken(payload) {
-        return jsonwebtoken_1.default.sign(payload, env_1.env.JWT_SECRET, {
+        const options = {
             expiresIn: env_1.env.JWT_EXPIRES_IN,
-        });
+        };
+        return jsonwebtoken_1.default.sign(payload, env_1.env.JWT_SECRET, options);
     }
     static generateRefreshToken(payload) {
-        return jsonwebtoken_1.default.sign(payload, env_1.env.JWT_REFRESH_SECRET, {
+        const options = {
             expiresIn: env_1.env.JWT_REFRESH_EXPIRES_IN,
-        });
+        };
+        return jsonwebtoken_1.default.sign(payload, env_1.env.JWT_REFRESH_SECRET, options);
     }
     static verifyAccessToken(token) {
         try {

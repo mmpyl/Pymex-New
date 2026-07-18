@@ -10,7 +10,7 @@ class UpdateUserProfileUseCase {
     async execute(userId, dto) {
         const user = await this.userRepository.findById(userId);
         if (!user) {
-            throw new UserNotFoundError_1.UserNotFoundError();
+            throw new UserNotFoundError_1.UserNotFoundError(userId);
         }
         if (dto.nombre !== undefined) {
             user.updateNombre(dto.nombre);

@@ -10,7 +10,7 @@ class GetUserByIdUseCase {
     async execute(id) {
         const user = await this.userRepository.findById(id);
         if (!user) {
-            throw new UserNotFoundError_1.UserNotFoundError();
+            throw new UserNotFoundError_1.UserNotFoundError(id);
         }
         return UserMapper_1.UserMapper.toResponseDto(user);
     }

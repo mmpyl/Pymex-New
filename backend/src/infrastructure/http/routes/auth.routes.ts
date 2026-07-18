@@ -17,16 +17,10 @@ const router = Router();
 const userRepository = new UserRepository();
 const passwordService = new BcryptPasswordService();
 
-// Initialize use cases with JWT configuration from environment
-const loginUseCase = new LoginUseCase(
-  userRepository,
-  passwordService,
-  env.JWT_SECRET,
-  env.JWT_EXPIRES_IN || '15m',
-  env.JWT_REFRESH_EXPIRES_IN || '7d'
-);
-const registerUseCase = new RegisterUserUseCase(userRepository, passwordService, env.JWT_SECRET);
-const refreshTokenUseCase = new RefreshTokenUseCase(env.JWT_SECRET, env.JWT_EXPIRES_IN || '15m', env.JWT_REFRESH_EXPIRES_IN || '7d');
+// Initialize use cases
+const loginUseCase = new LoginUseCase(userRepository, passwordService);
+const registerUseCase = new RegisterUserUseCase(userRepository, passwordService);
+const refreshTokenUseCase = new RefreshTokenUseCase();
 const logoutUseCase = new LogoutUseCase();
 
 // Initialize controller
