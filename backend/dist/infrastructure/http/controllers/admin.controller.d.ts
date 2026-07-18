@@ -11,6 +11,6 @@ export declare class AdminController {
     deleteUser(req: Request, res: Response): Promise<void>;
     changeRole(req: Request, res: Response): Promise<void>;
     suspendUser(req: Request, res: Response): Promise<void>;
-    getDashboardStats(req: Request, res: Response): Promise<void>;
+    getDashboardStats(res: Request, res: Response): Promise<void>;
 }
 //# sourceMappingURL=admin.controller.d.ts.map

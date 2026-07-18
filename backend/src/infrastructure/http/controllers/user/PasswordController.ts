@@ -31,7 +31,7 @@ export class PasswordController {
       const user = await this.userRepository.findById(userId);
       
       if (!user) {
-        throw new UserNotFoundError();
+        throw new UserNotFoundError(userId);
       }
       
       const isValid = await this.passwordService.compare(currentPassword, user.getPassword().getHash());

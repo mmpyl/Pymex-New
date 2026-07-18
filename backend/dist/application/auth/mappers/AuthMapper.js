@@ -6,13 +6,8 @@ const Email_1 = require("../../../domain/user/value-objects/Email");
 const Password_1 = require("../../../domain/user/value-objects/Password");
 const UserId_1 = require("../../../domain/user/value-objects/UserId");
 const UserRole_1 = require("../../../domain/user/value-objects/UserRole");
-function parseEstado(estado) {
-    if (estado === 'activo' || estado === 'inactivo' || estado === 'suspendido')
-        return estado;
-    throw new Error(`Invalid estado: ${String(estado)}`);
-}
 class AuthMapper {
-    static toAuthResponse(user, accessToken, refreshToken, expiresIn) {
+    static toAuthResponse(user, accessToken, refreshToken, _expiresIn) {
         return {
             user: {
                 id: user.getId().getValue(),

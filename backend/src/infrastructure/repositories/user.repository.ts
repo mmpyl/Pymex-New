@@ -18,9 +18,9 @@ export class UserRepository implements IUserRepository {
       nombre: model.nombre,
       email: Email.create(String(model.email)),
       password: Password.fromHash(String(model.password)),
-      rol: UserRole.create(model.rol as any),
+      rol: UserRole.create(model.rol),
       empresaId: model.empresaId,
-      estado: model.estado as any,
+      estado: model.estado,
       fechaRegistro: model.fechaRegistro,
     });
   }
@@ -34,9 +34,9 @@ export class UserRepository implements IUserRepository {
       nombre: model.nombre,
       email: Email.create(String(model.email)),
       password: Password.fromHash(String(model.password)),
-      rol: UserRole.create(model.rol as any),
+      rol: UserRole.create(model.rol),
       empresaId: model.empresaId,
-      estado: model.estado as any,
+      estado: model.estado,
       fechaRegistro: model.fechaRegistro,
     });
   }
@@ -54,9 +54,9 @@ export class UserRepository implements IUserRepository {
       nombre: model.nombre,
       email: Email.create(String(model.email)),
       password: Password.fromHash(String(model.password)),
-      rol: UserRole.create(model.rol as any),
+      rol: UserRole.create(model.rol),
       empresaId: model.empresaId,
-      estado: model.estado as any,
+      estado: model.estado,
       fechaRegistro: model.fechaRegistro,
     }));
 

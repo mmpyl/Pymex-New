@@ -40,7 +40,7 @@ export class AdminController {
   async getUserById(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const user = await this.getUserByIdUseCase.execute(Number(id));
+      const user = await this.getUserByIdUseCase.execute(id);
       res.status(200).json(user);
     } catch (error: any) {
       res.status(error.statusCode || 500).json({ error: error.message || 'Internal server error' });
@@ -50,7 +50,7 @@ export class AdminController {
   async deleteUser(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      await this.deleteUserUseCase.execute(Number(id));
+      await this.deleteUserUseCase.execute(id);
       res.status(204).send();
     } catch (error: any) {
       res.status(error.statusCode || 500).json({ error: error.message || 'Internal server error' });
@@ -67,7 +67,7 @@ export class AdminController {
         return;
       }
 
-      const updatedUser = await this.changeUserRoleUseCase.execute(Number(id), role);
+      const updatedUser = await this.changeUserRoleUseCase.execute(id, role);
       res.status(200).json(updatedUser);
     } catch (error: any) {
       res.status(error.statusCode || 500).json({ error: error.message || 'Internal server error' });
@@ -77,9 +77,8 @@ export class AdminController {
   async suspendUser(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const { reason } = req.body;
       
-      const updatedUser = await this.suspendUserUseCase.execute(Number(id), reason || 'No reason provided');
+      const updatedUser = await this.suspendUserUseCase.execute(id);
       res.status(200).json(updatedUser);
     } catch (error: any) {
       res.status(error.statusCode || 500).json({ error: error.message || 'Internal server error' });
@@ -87,7 +86,7 @@ export class AdminController {
   }
 
   // Placeholder for other admin functionalities
-  async getDashboardStats(req: Request, res: Response): Promise<void> {
+  async getDashboardStats(res: Request, res: Response): Promise<void> {
     res.status(200).json({ 
       message: 'Dashboard stats endpoint - to be implemented',
       stats: {

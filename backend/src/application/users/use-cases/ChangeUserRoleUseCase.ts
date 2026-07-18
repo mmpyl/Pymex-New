@@ -11,7 +11,7 @@ export class ChangeUserRoleUseCase {
     const user = await this.userRepository.findById(userId);
     
     if (!user) {
-      throw new UserNotFoundError();
+      throw new UserNotFoundError(userId);
     }
 
     user.updateRol(newRole);

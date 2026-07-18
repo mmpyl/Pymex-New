@@ -1,8 +1,7 @@
-import { Router } from 'express';
 import { Request, Response } from 'express';
 
 export class AnalyticsController {
-  async getCustomerChurn(req: Request, res: Response): Promise<void> {
+  async getCustomerChurn(_req: Request, res: Response): Promise<void> {
     try {
       res.status(200).json({ message: 'Customer churn analysis endpoint' });
     } catch (error) {
@@ -10,7 +9,7 @@ export class AnalyticsController {
     }
   }
 
-  async getInventoryOptimization(req: Request, res: Response): Promise<void> {
+  async getInventoryOptimization(_req: Request, res: Response): Promise<void> {
     try {
       res.status(200).json({ message: 'Inventory optimization endpoint' });
     } catch (error) {
@@ -18,7 +17,7 @@ export class AnalyticsController {
     }
   }
 
-  async getSalesForecast(req: Request, res: Response): Promise<void> {
+  async getSalesForecast(_req: Request, res: Response): Promise<void> {
     try {
       res.status(200).json({ message: 'Sales forecast endpoint' });
     } catch (error) {
@@ -26,7 +25,7 @@ export class AnalyticsController {
     }
   }
 
-  async triggerModelRetraining(req: Request, res: Response): Promise<void> {
+  async triggerModelRetraining(_req: Request, res: Response): Promise<void> {
     try {
       res.status(200).json({ message: 'Model retraining triggered' });
     } catch (error) {

@@ -6,20 +6,13 @@ import { Password } from '../../../domain/user/value-objects/Password';
 import { UserId } from '../../../domain/user/value-objects/UserId';
 import { UserRole } from '../../../domain/user/value-objects/UserRole';
 
-type UserModelEstado = 'activo' | 'inactivo' | 'suspendido';
-
-function parseEstado(estado: unknown): UserModelEstado {
-  if (estado === 'activo' || estado === 'inactivo' || estado === 'suspendido') return estado;
-  throw new Error(`Invalid estado: ${String(estado)}`);
-}
-
 export class AuthMapper {
 
   static toAuthResponse(
     user: User,
     accessToken: string,
     refreshToken: string,
-    expiresIn: number,
+    _expiresIn: number,
   ): AuthResponseDto {
     return {
       user: {
@@ -43,9 +36,9 @@ export class AuthMapper {
       nombre: model.nombre,
       email: Email.create(String(model.email)),
       password: Password.fromHash(String(model.password)),
-      rol: UserRole.create(model.rol as any),
+      rol: UserRole.create(model.rol),
       empresaId: model.empresaId,
-      estado: model.estado as 'activo' | 'inactivo' | 'suspendido',
+      estado: model.estado,
       fechaRegistro: model.fechaRegistro,
 
     });

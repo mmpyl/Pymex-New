@@ -2,6 +2,7 @@ export interface JwtPayload {
     userId: string;
     email: string;
     rol: string;
+    empresaId?: number;
 }
 export declare class JwtService {
     static generateAccessToken(payload: JwtPayload): string;

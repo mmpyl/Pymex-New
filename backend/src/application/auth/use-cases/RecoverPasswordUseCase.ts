@@ -3,7 +3,7 @@ import { RecoverPasswordDto } from '../dtos/RecoverPasswordDto';
 export class RecoverPasswordUseCase {
   constructor() {}
 
-  async execute(dto: RecoverPasswordDto): Promise<void> {
+  async execute(_dto: RecoverPasswordDto): Promise<void> {
     // TODO: Implementar lógica de recuperación de contraseña
     // 1. Buscar usuario por email
     // 2. Generar token de reset

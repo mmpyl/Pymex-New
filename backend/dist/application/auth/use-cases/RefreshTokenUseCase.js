@@ -7,6 +7,7 @@ class RefreshTokenUseCase {
         try {
             const decoded = JwtService_1.JwtService.verifyRefreshToken(dto.refreshToken);
             const userData = {
+                userId: decoded.userId,
                 id: decoded.userId,
                 email: decoded.email,
                 rol: decoded.rol,

@@ -10,16 +10,15 @@ const RegisterUserUseCase_1 = require("../../../application/auth/use-cases/Regis
 const RefreshTokenUseCase_1 = require("../../../application/auth/use-cases/RefreshTokenUseCase");
 const LogoutUseCase_1 = require("../../../application/auth/use-cases/LogoutUseCase");
 const auth_middleware_1 = require("../middleware/auth.middleware");
-const env_1 = require("../../../config/env");
 const router = (0, express_1.Router)();
 exports.authRoutes = router;
 // Initialize dependencies
 const userRepository = new user_repository_1.UserRepository();
 const passwordService = new BcryptPasswordService_1.BcryptPasswordService();
-// Initialize use cases with JWT configuration from environment
-const loginUseCase = new LoginUseCase_1.LoginUseCase(userRepository, passwordService, env_1.env.JWT_SECRET, env_1.env.JWT_EXPIRES_IN || '15m', env_1.env.JWT_REFRESH_EXPIRES_IN || '7d');
-const registerUseCase = new RegisterUserUseCase_1.RegisterUserUseCase(userRepository, passwordService, env_1.env.JWT_SECRET);
-const refreshTokenUseCase = new RefreshTokenUseCase_1.RefreshTokenUseCase(env_1.env.JWT_SECRET, env_1.env.JWT_EXPIRES_IN || '15m', env_1.env.JWT_REFRESH_EXPIRES_IN || '7d');
+// Initialize use cases
+const loginUseCase = new LoginUseCase_1.LoginUseCase(userRepository, passwordService);
+const registerUseCase = new RegisterUserUseCase_1.RegisterUserUseCase(userRepository, passwordService);
+const refreshTokenUseCase = new RefreshTokenUseCase_1.RefreshTokenUseCase();
 const logoutUseCase = new LogoutUseCase_1.LogoutUseCase();
 // Initialize controller
 const authController = new auth_controller_1.AuthController(loginUseCase, registerUseCase, refreshTokenUseCase, logoutUseCase);

@@ -7,11 +7,11 @@ import { UserNotFoundError } from '../../../domain/user/errors/UserNotFoundError
 export class UpdateUserProfileUseCase {
   constructor(private userRepository: IUserRepository) {}
 
-  async execute(userId: number, dto: Partial<UpdateUserDto>): Promise<UserResponseDto> {
+  async execute(userId: string, dto: Partial<UpdateUserDto>): Promise<UserResponseDto> {
     const user = await this.userRepository.findById(userId);
     
     if (!user) {
-      throw new UserNotFoundError();
+      throw new UserNotFoundError(userId);
     }
 
     if (dto.nombre !== undefined) {

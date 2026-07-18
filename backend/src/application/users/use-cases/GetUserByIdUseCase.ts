@@ -10,7 +10,7 @@ export class GetUserByIdUseCase {
     const user = await this.userRepository.findById(id);
     
     if (!user) {
-      throw new UserNotFoundError();
+      throw new UserNotFoundError(id);
     }
 
     return UserMapper.toResponseDto(user);
