@@ -9,10 +9,8 @@ import { UserNotFoundError } from '../../domain/user/errors/UserNotFoundError';
 import { Op } from 'sequelize';
 
 export class UserRepository implements IUserRepository {
-  async findById(id: string): Promise<User | null> {
-    const model = await UserModel.findByPk(id);
-    if (!model) return null;
 
+  private toDomain(model: UserModel): User {
     return User.restore({
       id: UserId.create(String(model.id)),
       nombre: model.nombre,
@@ -24,21 +22,16 @@ export class UserRepository implements IUserRepository {
       fechaRegistro: model.fechaRegistro,
     });
   }
+  async findById(id: string): Promise<User | null> {
+    const model = await UserModel.findByPk(id);
+    if (!model) return null;
+    return this.toDomain(model);
+  }
 
   async findByEmail(email: string): Promise<User | null> {
     const model = await UserModel.findOne({ where: { email } });
     if (!model) return null;
-
-    return User.restore({
-      id: UserId.create(String(model.id)),
-      nombre: model.nombre,
-      email: Email.create(String(model.email)),
-      password: Password.fromHash(String(model.password)),
-      rol: UserRole.create(model.rol),
-      empresaId: model.empresaId,
-      estado: model.estado,
-      fechaRegistro: model.fechaRegistro,
-    });
+    return this.toDomain(model);
   }
 
   async findByEmpresaId(empresaId: number, page: number = 1, limit: number = 10): Promise<{ users: User[]; total: number }> {
@@ -48,19 +41,20 @@ export class UserRepository implements IUserRepository {
       offset,
       limit,
     });
-
-    const users = rows.map(model => User.restore({
-      id: UserId.create(String(model.id)),
-      nombre: model.nombre,
-      email: Email.create(String(model.email)),
-      password: Password.fromHash(String(model.password)),
-      rol: UserRole.create(model.rol),
-      empresaId: model.empresaId,
-      estado: model.estado,
-      fechaRegistro: model.fechaRegistro,
-    }));
+    const users = rows.map(model => this.toDomain(model));
 
     return { users, total: count };
+  }
+
+  async findAll(page: number = 1, limit: number = 10): Promise<{ users: User[]; total: number }> {
+    const offset = (page - 1) * limit;
+    const { count, rows } = await UserModel.findAndCountAll({
+      offset,
+      limit,
+      order: [['fechaRegistro', 'DESC']],
+    });
+
+    return { users: rows.map(model => this.toDomain(model)), total: count };
   }
 
   async save(user: User): Promise<void> {

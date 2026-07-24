@@ -86,7 +86,7 @@ export class AdminController {
   }
 
   // Placeholder for other admin functionalities
-  async getDashboardStats(res: Request, res: Response): Promise<void> {
+  async getDashboardStats(_req: Request, res: Response): Promise<void> {
     res.status(200).json({ 
       message: 'Dashboard stats endpoint - to be implemented',
       stats: {

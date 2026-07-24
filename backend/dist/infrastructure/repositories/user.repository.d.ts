@@ -1,9 +1,14 @@
 import { IUserRepository } from '../../domain/user/repositories/IUserRepository';
 import { User } from '../../domain/user/entities/User';
 export declare class UserRepository implements IUserRepository {
+    private toDomain;
     findById(id: string): Promise<User | null>;
     findByEmail(email: string): Promise<User | null>;
     findByEmpresaId(empresaId: number, page?: number, limit?: number): Promise<{
+        users: User[];
+        total: number;
+    }>;
+    findAll(page?: number, limit?: number): Promise<{
         users: User[];
         total: number;
     }>;

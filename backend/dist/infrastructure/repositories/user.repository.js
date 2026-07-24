@@ -10,10 +10,7 @@ const UserRole_1 = require("../../domain/user/value-objects/UserRole");
 const UserNotFoundError_1 = require("../../domain/user/errors/UserNotFoundError");
 const sequelize_1 = require("sequelize");
 class UserRepository {
-    async findById(id) {
-        const model = await user_model_1.UserModel.findByPk(id);
-        if (!model)
-            return null;
+    toDomain(model) {
         return User_1.User.restore({
             id: UserId_1.UserId.create(String(model.id)),
             nombre: model.nombre,
@@ -25,20 +22,17 @@ class UserRepository {
             fechaRegistro: model.fechaRegistro,
         });
     }
+    async findById(id) {
+        const model = await user_model_1.UserModel.findByPk(id);
+        if (!model)
+            return null;
+        return this.toDomain(model);
+    }
     async findByEmail(email) {
         const model = await user_model_1.UserModel.findOne({ where: { email } });
         if (!model)
             return null;
-        return User_1.User.restore({
-            id: UserId_1.UserId.create(String(model.id)),
-            nombre: model.nombre,
-            email: Email_1.Email.create(String(model.email)),
-            password: Password_1.Password.fromHash(String(model.password)),
-            rol: UserRole_1.UserRole.create(model.rol),
-            empresaId: model.empresaId,
-            estado: model.estado,
-            fechaRegistro: model.fechaRegistro,
-        });
+        return this.toDomain(model);
     }
     async findByEmpresaId(empresaId, page = 1, limit = 10) {
         const offset = (page - 1) * limit;
@@ -47,17 +41,17 @@ class UserRepository {
             offset,
             limit,
         });
-        const users = rows.map(model => User_1.User.restore({
-            id: UserId_1.UserId.create(String(model.id)),
-            nombre: model.nombre,
-            email: Email_1.Email.create(String(model.email)),
-            password: Password_1.Password.fromHash(String(model.password)),
-            rol: UserRole_1.UserRole.create(model.rol),
-            empresaId: model.empresaId,
-            estado: model.estado,
-            fechaRegistro: model.fechaRegistro,
-        }));
+        const users = rows.map(model => this.toDomain(model));
         return { users, total: count };
+    }
+    async findAll(page = 1, limit = 10) {
+        const offset = (page - 1) * limit;
+        const { count, rows } = await user_model_1.UserModel.findAndCountAll({
+            offset,
+            limit,
+            order: [['fechaRegistro', 'DESC']],
+        });
+        return { users: rows.map(model => this.toDomain(model)), total: count };
     }
     async save(user) {
         await user_model_1.UserModel.findOrCreate({

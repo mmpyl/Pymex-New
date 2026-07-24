@@ -37,10 +37,7 @@ class UpdateUserProfileUseCase {
             }
         }
         if (dto.empresaId !== undefined) {
-            // Assuming there's a method to update empresaId, or we need to add it
-            // For now, we'll access the internal props through toObject and recreate
-            const props = user.toObject();
-            props.empresaId = dto.empresaId;
+            user.updateEmpresaId(dto.empresaId);
         }
         await this.userRepository.update(user);
         return UserMapper_1.UserMapper.toResponseDto(user);

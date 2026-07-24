@@ -6,7 +6,9 @@ export declare class UserController {
     private deleteUserUseCase;
     private changeRoleUseCase;
     private suspendUserUseCase;
+    private createUserUseCase;
     constructor();
+    create: (req: Request, res: Response) => Promise<void>;
     getAll: (req: Request, res: Response) => Promise<void>;
     getById: (req: Request, res: Response) => Promise<void>;
     update: (req: Request, res: Response) => Promise<void>;

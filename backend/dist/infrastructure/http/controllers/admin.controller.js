@@ -72,7 +72,7 @@ class AdminController {
         }
     }
     // Placeholder for other admin functionalities
-    async getDashboardStats(res, res) {
+    async getDashboardStats(_req, res) {
         res.status(200).json({
             message: 'Dashboard stats endpoint - to be implemented',
             stats: {

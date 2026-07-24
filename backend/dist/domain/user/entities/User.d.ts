@@ -29,6 +29,7 @@ export declare class User {
     updateEmail(email: string): void;
     updatePassword(password: string): void;
     updateRol(rol: UserRoleType): void;
+    updateEmpresaId(empresaId?: number): void;
     activate(): void;
     deactivate(): void;
     suspend(): void;

@@ -85,6 +85,10 @@ export class User {
     this.props = { ...this.props, rol: UserRole.create(rol) };
   }
 
+  updateEmpresaId(empresaId?: number): void {
+    this.props = { ...this.props, empresaId };
+  }
+
   activate(): void {
     this.props = { ...this.props, estado: 'activo' };
   }

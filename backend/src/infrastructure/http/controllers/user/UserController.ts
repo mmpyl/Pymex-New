@@ -5,8 +5,11 @@ import { UpdateUserProfileUseCase } from '../../../../application/users/use-case
 import { DeleteUserUseCase } from '../../../../application/users/use-cases/DeleteUserUseCase';
 import { ChangeUserRoleUseCase } from '../../../../application/users/use-cases/ChangeUserRoleUseCase';
 import { SuspendUserUseCase } from '../../../../application/users/use-cases/SuspendUserUseCase';
+import { CreateUserUseCase } from '../../../../application/users/use-cases/CreateUserUseCase';
 import { UserRepository } from '../../../repositories/user.repository';
 import { UpdateUserDto } from '../../../../application/users/dtos/UpdateUserDto';
+import { CreateUserDto } from '../../../../application/users/dtos/CreateUserDto';
+import { BcryptPasswordService } from '../../../services/BcryptPasswordService';
 import { UserRoleType } from '../../../../domain/user/value-objects/UserRole';
 
 export class UserController {
@@ -16,16 +19,45 @@ export class UserController {
   private deleteUserUseCase: DeleteUserUseCase;
   private changeRoleUseCase: ChangeUserRoleUseCase;
   private suspendUserUseCase: SuspendUserUseCase;
+  private createUserUseCase: CreateUserUseCase;
 
   constructor() {
     const userRepository = new UserRepository();
+    const passwordService = new BcryptPasswordService();
     this.getAllUsersUseCase = new GetAllUsersUseCase(userRepository);
     this.getUserByIdUseCase = new GetUserByIdUseCase(userRepository);
     this.updateProfileUseCase = new UpdateUserProfileUseCase(userRepository);
     this.deleteUserUseCase = new DeleteUserUseCase(userRepository);
     this.changeRoleUseCase = new ChangeUserRoleUseCase(userRepository);
     this.suspendUserUseCase = new SuspendUserUseCase(userRepository);
+    this.createUserUseCase = new CreateUserUseCase(userRepository, passwordService);
   }
+
+
+  create = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { nombre, email, password, rol, empresaId } = req.body;
+
+      if (!nombre || !email || !password) {
+        res.status(400).json({ error: 'Nombre, email and password are required' });
+        return;
+      }
+
+      const dto: CreateUserDto = { nombre, email, password, rol, empresaId };
+      const result = await this.createUserUseCase.execute(dto);
+
+      res.status(201).json({
+        success: true,
+        data: result,
+      });
+    } catch (error: any) {
+      if (error.message === 'Email already registered') {
+        res.status(409).json({ error: error.message });
+        return;
+      }
+      res.status(400).json({ error: error.message || 'Failed to create user' });
+    }
+  };
 
   getAll = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -77,7 +109,7 @@ export class UserController {
         estado
       };
       
-const result = await this.updateProfileUseCase.execute(Number(id), dto);
+      const result = await this.updateProfileUseCase.execute(id, dto);
       
       res.status(200).json({
         success: true,
