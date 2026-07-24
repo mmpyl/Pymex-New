@@ -8,7 +8,6 @@ import { RefreshTokenUseCase } from '../../../application/auth/use-cases/Refresh
 import { LogoutUseCase } from '../../../application/auth/use-cases/LogoutUseCase';
 
 import { authMiddleware } from '../middleware/auth.middleware';
-import { env } from '../../../config/env';
 
 const router = Router();
 

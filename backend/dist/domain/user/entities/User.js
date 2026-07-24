@@ -60,6 +60,9 @@ class User {
     updateRol(rol) {
         this.props = { ...this.props, rol: UserRole_1.UserRole.create(rol) };
     }
+    updateEmpresaId(empresaId) {
+        this.props = { ...this.props, empresaId };
+    }
     activate() {
         this.props = { ...this.props, estado: 'activo' };
     }

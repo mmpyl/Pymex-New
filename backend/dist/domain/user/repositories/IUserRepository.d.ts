@@ -6,6 +6,10 @@ export interface IUserRepository {
         users: User[];
         total: number;
     }>;
+    findAll(page?: number, limit?: number): Promise<{
+        users: User[];
+        total: number;
+    }>;
     save(user: User): Promise<void>;
     update(user: User): Promise<void>;
     delete(id: string): Promise<void>;
