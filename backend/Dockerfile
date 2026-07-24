@@ -18,13 +18,16 @@ WORKDIR /app
 
 COPY package*.json ./
 
-# Instala dependencias de producción (sin devDependencies)
-RUN npm ci --omit=dev
+# Instalar TODAS las dependencias (incluye devDependencies como typescript y ts-node)
+RUN npm ci
 
 COPY . .
 
-# Compila TypeScript a dist
+# Compila TypeScript a JavaScript
 RUN npm run build
+
+# Eliminar dependencias de desarrollo después del build
+RUN npm prune --production
 
 EXPOSE 3000
 
