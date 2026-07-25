@@ -1,7 +1,9 @@
+import { useAuthStore } from '../store/auth.store';
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
 
 const getAuthHeaders = () => {
-  const token = localStorage.getItem('accessToken');
+  const token = useAuthStore.getState().accessToken;
   return {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -10,7 +12,7 @@ const getAuthHeaders = () => {
 
 const parseResponse = async (response) => {
   const payload = await response.json().catch(() => ({}));
-
+  
   if (!response.ok) {
     throw new Error(payload.error || 'Error al comunicarse con el servicio de usuarios');
   }
