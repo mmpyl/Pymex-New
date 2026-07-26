@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { JwtService, JwtPayload } from '../../services/JwtService';
+import { env } from '../../config/env';
 
 
 export interface AuthRequest extends Request {
@@ -7,9 +8,21 @@ export interface AuthRequest extends Request {
 }
 
 export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction): void => {
+  // Modo desarrollo: bypass de autenticación si la variable está activada
+  if (env.NODE_ENV === 'development' && process.env.AUTH_BYPASS === 'true') {
+    req.user = {
+      userId: 'dev-user-id',
+      email: 'dev@example.com',
+      rol: 'admin',
+      empresaId: 1,
+    };
+    next();
+    return;
+  }
+
   try {
     const authHeader = req.headers.authorization;
-    
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       res.status(401).json({ error: 'Access token is missing or invalid' });
       return;
@@ -17,7 +30,7 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
 
     const token = authHeader.split(' ')[1];
     const payload = JwtService.verifyAccessToken(token);
-    
+
     req.user = payload;
     next();
   } catch (error: any) {
@@ -28,13 +41,13 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
 export const optionalAuthMiddleware = (req: AuthRequest, _res: Response, next: NextFunction): void => {
   try {
     const authHeader = req.headers.authorization;
-    
+
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.split(' ')[1];
       const payload = JwtService.verifyAccessToken(token);
       req.user = payload;
     }
-    
+
     next();
   } catch (error) {
     // Continue without user context
