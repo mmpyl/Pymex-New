@@ -2,7 +2,19 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.optionalAuthMiddleware = exports.authMiddleware = void 0;
 const JwtService_1 = require("../../services/JwtService");
+const env_1 = require("../../../config/env");
 const authMiddleware = (req, res, next) => {
+    // Modo desarrollo: bypass de autenticación si la variable está activada
+    if (env_1.env.NODE_ENV === 'development' && process.env.AUTH_BYPASS === 'true') {
+        req.user = {
+            userId: 'dev-user-id',
+            email: 'dev@example.com',
+            rol: 'admin',
+            empresaId: 1,
+        };
+        next();
+        return;
+    }
     try {
         const authHeader = req.headers.authorization;
         if (!authHeader || !authHeader.startsWith('Bearer ')) {

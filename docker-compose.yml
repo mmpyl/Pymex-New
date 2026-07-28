@@ -57,6 +57,7 @@ services:
 
     environment:
       NODE_ENV: development
+      AUTH_BYPASS: "true"
 
 
       DB_HOST: postgres

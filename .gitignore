@@ -1,92 +1,54 @@
-```gitignore
+```
+# Build artifacts
+dist/
+build/
+*.d.ts.map
+*.js.map
+
 # Dependencies
 node_modules/
 
-# Build outputs
-dist/
-build/
-*.js.map
-*.ts.map
-*.jsx.map
-*.tsx.map
-
-# Environment variables
+# Environment
 .env
 .env.local
-.env.*
-!.env.example
+*.env.*
 
-# IDE files
+# Editors
 .vscode/
 .idea/
-*.swp
-*.swo
-*.tmp
 
-# Logs
+# Logs and temp files
 *.log
+*.tmp
+*.swp
 
-# Coverage
-coverage/
-htmlcov/
-.coverage
-
-# Python (if present)
+# Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-.Python
-env/
-venv/
-.venv/
-pip-log.txt
-pip-delete-this-directory.txt
-.tox/
-.coverage
-.nox/
-*.cover
-*.log
+
+# Compiled
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+*.out
+
+# System
 .DS_Store
 Thumbs.db
-```
-
-Wait, let me reconsider. The changes are only TypeScript/TSX files, which suggests this might be primarily a JavaScript/TypeScript project. Let me optimize for that:
-
-```gitignore
-# Dependencies
-node_modules/
-
-# Build outputs
-dist/
-build/
-*.js.map
-*.ts.map
-*.jsx.map
-*.tsx.map
-
-# Environment variables
-.env
-.env.local
-.env.*
-!.env.example
-
-# IDE files
-.vscode/
-.idea/
-*.swp
-*.swo
-*.tmp
-
-# Logs
-*.log
 
 # Coverage
 coverage/
 htmlcov/
 .coverage
 
-# OS generated files
-.DS_Store
-Thumbs.db
+# Cache
+.mypy_cache/
+.pytest_cache/
+.gradle/
+target/
 ```

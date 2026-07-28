@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { JwtService, JwtPayload } from '../../services/JwtService';
-import { env } from '../../config/env';
+import { env } from '../../../config/env';
 
 
 export interface AuthRequest extends Request {
