@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuthStore } from '../../store/auth.store';
+import { authService } from '../../services/core/auth.service';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
 
@@ -17,20 +18,10 @@ export default function LoginForm() {
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Error al iniciar sesión');
-      }
+      const data = await authService.login({ email, password });
 
       // Guardar tokens y usuario en el store
-      login(data.data.accessToken, data.data.refreshToken, data.data.user);
+      login(data.accessToken, data.refreshToken, data.user);
 
       toast.success('Inicio de sesión exitoso');
       navigate('/admin/users');
