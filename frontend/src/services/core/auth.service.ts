@@ -41,6 +41,7 @@ const parseResponse = async (response: Response): Promise<any> => {
     throw new Error(payload.error || 'Error al comunicarse con el servicio de autenticación');
   }
 
+  // El backend devuelve { success: true, data: { ... } }
   return payload.data ?? payload;
 };
 
@@ -73,11 +74,17 @@ export const authService = {
   },
 
   async logout(): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/auth/logout`, {
-      method: 'POST',
-      headers: getAuthHeaders(),
-    });
-    return parseResponse(response);
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+      });
+      if (response.ok) {
+        await response.json();
+      }
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
   },
 
   async getProfile() {
